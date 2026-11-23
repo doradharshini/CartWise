@@ -1,0 +1,45 @@
+@use './mixins' as m;
+
+.sort-menu__button {
+  @include m.outline-button(var(--foreground), var(--neutral-200), var(--radius-xl), 2.5rem);
+}
+
+.sort-menu__button--bold {
+  --mat-button-outlined-label-text-weight: 600;
+}
+
+:host-context(.dark) .sort-menu__button {
+  @include m.outline-button(var(--neutral-300), var(--neutral-700), var(--radius-xl), 2.5rem);
+}
+
+:host-context(.dark) .sort-menu__button--bold {
+  --mat-button-outlined-label-text-weight: 600;
+}
+
+.sort-menu__icon {
+  @include m.icon-size(1rem);
+}
+
+.sort-menu__chevron {
+  @include m.icon-size(0.875rem);
+  transition: transform 0.15s;
+}
+
+.sort-menu__chevron--open {
+  transform: rotate(180deg);
+}
+
+.sort-menu__option-label {
+  font-size: 0.75rem;
+  line-height: 1rem;
+  font-weight: 500;
+}
+
+.sort-menu__option-label--active {
+  font-weight: 700;
+}
+
+.sort-menu__option .sort-menu__check {
+  @include m.icon-size(1rem);
+  margin: 0 0 0 0.75rem;
+}

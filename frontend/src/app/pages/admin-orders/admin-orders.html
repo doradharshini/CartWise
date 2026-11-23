@@ -1,0 +1,138 @@
+@if (isLoading()) {
+  <div class="orders-loading">
+    <div class="orders-loading__label">
+      <mat-icon class="spin">autorenew</mat-icon> Loading orders...
+    </div>
+  </div>
+} @else {
+  <div class="orders-page">
+    <!-- Toast -->
+    @if (notification().show) {
+      <div class="toast fade-up">
+        <div class="toast__body" [class.toast__body--error]="notification().type === 'error'">
+          <mat-icon>{{ notification().type === 'error' ? 'error_outline' : 'check_circle' }}</mat-icon>
+          {{ notification().message }}
+        </div>
+      </div>
+    }
+
+    <main class="orders-main">
+      <!-- Header -->
+      <div class="header fade-up">
+        <div>
+          <h1 class="header__title">Manage Orders</h1>
+          <p class="header__subtitle">Track every order and move it through fulfillment.</p>
+        </div>
+
+        <div class="search">
+          <mat-icon class="search__icon">search</mat-icon>
+          <input
+            class="search__input"
+            placeholder="Search order #, SKU, buyer name, or email…"
+            aria-label="Search orders"
+            [value]="searchQuery()"
+            (input)="searchQuery.set($any($event.target).value)"
+          />
+          @if (searchQuery()) {
+            <button class="search__clear" (click)="searchQuery.set('')" aria-label="Clear search">
+              <mat-icon>close</mat-icon>
+            </button>
+          }
+        </div>
+      </div>
+
+      <!-- Filter Tabs -->
+      <div class="tabs fade-up" style="animation-delay: 100ms">
+        @for (status of statusTabs; track status) {
+          <button class="tab" [class.tab--active]="activeFilter() === status" (click)="activeFilter.set(status)">
+            <span class="tab__label">{{ status === 'ALL' ? 'All Orders' : status.toLowerCase() }}</span>
+            <span class="tab__count">{{ getCountForStatus(status) }}</span>
+          </button>
+        }
+      </div>
+
+      @if (error()) {
+        <div class="error-box">{{ error() }}</div>
+      }
+
+      <!-- Orders Table -->
+      @if (filteredOrders().length === 0) {
+        <div class="empty">
+          <mat-icon class="empty__icon">shopping_bag</mat-icon>
+          <h3 class="empty__title">No matching orders</h3>
+          <p class="empty__text">Try a different filter or search term.</p>
+        </div>
+      } @else {
+        <div class="table-card">
+          <div class="table-card__scroll">
+            <table class="table">
+              <thead class="table__head">
+                <tr>
+                  <th>Order</th>
+                  <th>Buyer</th>
+                  <th>Placed</th>
+                  <th>Items</th>
+                  <th>Total</th>
+                  <th>Status</th>
+                  <th class="table__cell--right">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (order of filteredOrders(); track order.id) {
+                  @let isUpdating = updatingOrderId() === order.id;
+                  @let canShip = order.orderStatus === 'PROCESSING';
+                  @let canDeliver = order.orderStatus === 'SHIPPED';
+                  @let buyer = buyerInfo()[order.userId];
+                  @let cfg = statusCfg(order.orderStatus);
+                  <tr class="table__row">
+                    <td class="table__cell table__cell--mono table__cell--strong">
+                      #{{ order.orderNumber?.slice(0, 8).toUpperCase() }}
+                    </td>
+                    <td class="table__cell">
+                      @if (buyer) {
+                        <div class="buyer">
+                          <span class="buyer__name">{{ buyer.firstName }} {{ buyer.lastName }}</span>
+                          <span class="buyer__email">{{ buyer.email }}</span>
+                        </div>
+                      } @else {
+                        <span class="table__mono-small">{{ order.userId?.slice(0, 8) }}…</span>
+                      }
+                    </td>
+                    <td class="table__cell table__cell--small">{{ formatDate(order.createdAt) }}</td>
+                    <td class="table__cell">{{ itemCount(order) }}</td>
+                    <td class="table__cell table__cell--total">{{ formatPrice(order.totalPrice) }}</td>
+                    <td class="table__cell">
+                      <span class="status" [class]="'status status--' + (cfg?.mod || 'unknown')">
+                        @if (cfg) {
+                          <mat-icon>{{ cfg.icon }}</mat-icon>
+                        }
+                        {{ cfg?.label || order.orderStatus }}
+                      </span>
+                    </td>
+                    <td class="table__cell table__cell--right">
+                      @if (canShip) {
+                        <button mat-flat-button class="action action--ship" (click)="handleStatusUpdate(order, 'SHIPPED')" [disabled]="isUpdating">
+                          <mat-icon>inventory</mat-icon>
+                          {{ isUpdating ? '...' : 'Mark Shipped' }}
+                        </button>
+                      }
+                      @if (canDeliver) {
+                        <button mat-flat-button class="action action--deliver" (click)="handleStatusUpdate(order, 'DELIVERED')" [disabled]="isUpdating">
+                          <mat-icon>done_all</mat-icon>
+                          {{ isUpdating ? '...' : 'Mark Delivered' }}
+                        </button>
+                      }
+                      @if (!canShip && !canDeliver) {
+                        <span class="table__dash">—</span>
+                      }
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      }
+    </main>
+  </div>
+}

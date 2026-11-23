@@ -1,0 +1,165 @@
+@if (isLoading()) {
+  <div class="dash-loading">
+    <div class="dash-loading__label">
+      <div class="dash-loading__icon">
+        <mat-icon class="spin">autorenew</mat-icon>
+      </div>
+      Loading your workspace...
+    </div>
+  </div>
+} @else {
+  <div class="dash">
+    <main class="dash__main">
+      <!-- Header -->
+      <div class="header">
+        <div>
+          <p class="header__eyebrow">Overview</p>
+          <h1 class="header__title">Seller Dashboard</h1>
+          <p class="header__subtitle">Manage your products, stock, and track your earnings.</p>
+        </div>
+        @if (activeTab() === 'products') {
+          <button mat-flat-button class="btn btn--neutral btn--raised" (click)="openAddProductModal()">
+            <mat-icon>add</mat-icon> Add New Product
+          </button>
+        }
+      </div>
+
+      <!-- Tabs -->
+      <div class="tabs">
+        @for (t of tabs; track t.key) {
+          <button class="tab" [class.tab--active]="activeTab() === t.key" (click)="activeTab.set($any(t.key))">
+            <mat-icon>{{ t.icon }}</mat-icon>
+            {{ t.label }}
+          </button>
+        }
+      </div>
+
+      <!-- Global action message -->
+      @if (actionMessage().text && !selectedProduct() && !isProductModalOpen() && !deleteTarget()) {
+        <div class="notice notice--page anim-in" [class.notice--error]="actionMessage().type === 'error'">
+          <div class="notice__icon">
+            <mat-icon>{{ actionMessage().type === 'error' ? 'error_outline' : 'check_circle' }}</mat-icon>
+          </div>
+          <span class="notice__text">{{ actionMessage().text }}</span>
+        </div>
+      }
+
+      <!-- PRODUCTS TAB -->
+      @if (activeTab() === 'products') {
+        @if (error()) {
+          <div class="error-card">
+            <mat-icon>error_outline</mat-icon>
+            <div>{{ error() }}</div>
+          </div>
+        } @else if (products().length === 0) {
+          <div class="empty anim-in">
+            <div class="empty__icon">
+              <mat-icon>inventory_2</mat-icon>
+            </div>
+            <h3 class="empty__title">Your catalog is empty</h3>
+            <p class="empty__text">Start building your store by adding your first product. It only takes a few minutes.</p>
+            <button mat-flat-button class="btn btn--indigo" (click)="openAddProductModal()">
+              <mat-icon>add</mat-icon> Create Product
+            </button>
+          </div>
+        } @else {
+          <div class="table-card anim-in">
+            <div class="table-card__scroll">
+              <table class="table">
+                <thead class="table__head">
+                  <tr>
+                    <th>Product Details</th>
+                    <th>SKU Code</th>
+                    <th>Category</th>
+                    <th>Price</th>
+                    <th class="table__right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (product of products(); track product.id) {
+                    <tr class="table__row">
+                      <td>
+                        <div class="product">
+                          <div class="product__thumb">
+                            @if (product.imageUrl && !failedImages().has(product.id)) {
+                              <img class="product__img" [src]="product.imageUrl" [alt]="product.name" (error)="markImageFailed(product.id)" />
+                            } @else {
+                              <mat-icon class="product__placeholder">image</mat-icon>
+                            }
+                          </div>
+                          <span class="product__name">{{ product.name }}</span>
+                        </div>
+                      </td>
+                      <td class="table__sku"><span>{{ product.skuCode }}</span></td>
+                      <td class="table__category">{{ categoryName(product) }}</td>
+                      <td class="table__price">{{ formatPrice(product.price) }}</td>
+                      <td class="table__right">
+                        <div class="row-actions">
+                          <button mat-stroked-button class="btn btn--outline btn--sm" (click)="openStockModal(product)">
+                            <mat-icon>inventory_2</mat-icon> Stock
+                          </button>
+                          <button mat-stroked-button class="btn btn--outline btn--square" (click)="openEditProductModal(product)" aria-label="Edit product">
+                            <mat-icon>edit</mat-icon>
+                          </button>
+                          <button mat-stroked-button class="btn btn--outline btn--square btn--danger-outline" (click)="deleteTarget.set(product)" aria-label="Delete product">
+                            <mat-icon>delete_outline</mat-icon>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+        }
+      }
+
+      <!-- EARNINGS TAB -->
+      @if (activeTab() === 'earnings') {
+        <app-earnings-tab [state]="earnings()" [productCount]="products().length" [formatPrice]="formatPriceFn" />
+      }
+
+      <!-- ADD/EDIT PRODUCT MODAL -->
+      @if (isProductModalOpen()) {
+        <app-product-form-modal
+          [mode]="modalMode()"
+          [form]="productForm"
+          [categories]="categories()"
+          [existingImages]="existingImageUrls()"
+          [newImages]="newImagePreviews()"
+          [message]="actionMessage()"
+          [submitting]="isSubmittingProduct()"
+          (closed)="closeProductModal()"
+          (submitted)="handleSubmitProduct()"
+          (removeExisting)="removeExistingImage($event)"
+          (removeNew)="removeNewImage($event)"
+          (filesSelected)="handleFileSelect($event)"
+        />
+      }
+
+      <!-- DELETE CONFIRM MODAL -->
+      @if (deleteTarget(); as target) {
+        <app-delete-confirm-modal
+          [target]="target"
+          [busy]="isDeleting()"
+          (cancelled)="deleteTarget.set(null)"
+          (confirmed)="confirmDeleteProduct()"
+        />
+      }
+
+      <!-- INVENTORY MODAL -->
+      @if (selectedProduct(); as sp) {
+        <app-stock-modal
+          [product]="sp"
+          [currentStock]="currentStock()"
+          [isChecking]="isCheckingStock()"
+          [submitting]="isSubmittingInventory()"
+          [message]="actionMessage()"
+          (closed)="selectedProduct.set(null)"
+          (addStock)="handleAddStock($event)"
+        />
+      }
+    </main>
+  </div>
+}

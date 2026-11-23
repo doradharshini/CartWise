@@ -1,0 +1,90 @@
+@if (view === 'list') {
+  <div class="pcard pcard--list" appReveal [revealDelay]="(index % staggerMod) * 55" [revealY]="28" [revealScale]="0.97">
+    <div class="pcard__surface">
+      <!-- Image -->
+      <div class="pcard__media">
+        @if (showImage()) {
+          <img class="pcard__img" [src]="product.imageUrl" [alt]="product.name" (error)="imgFailed.set(true)" />
+        } @else {
+          <div class="pcard__placeholder">
+            <mat-icon class="pcard__placeholder-icon">image</mat-icon>
+            <span class="pcard__placeholder-text">No Image</span>
+          </div>
+        }
+        <button
+          type="button"
+          class="pcard__wish"
+          [class.pcard__wish--saved]="saved"
+          aria-label="Toggle wishlist"
+          (click)="onWishlist($event)"
+        >
+          <mat-icon class="pcard__wish-icon">{{ saved ? 'favorite' : 'favorite_border' }}</mat-icon>
+        </button>
+      </div>
+
+      <!-- Content -->
+      <div class="pcard__content">
+        <div class="pcard__info">
+          <span class="pcard__category">{{ label() }}</span>
+          <a [routerLink]="['/product', product.id]">
+            <h3 class="pcard__title">{{ product.name }}</h3>
+          </a>
+          <app-product-rating-badge [skuCode]="product.skuCode" />
+        </div>
+        <div class="pcard__buy">
+          <span class="pcard__price">{{ formatPrice(product.price) }}</span>
+          <button mat-flat-button class="pcard__add" (click)="onAdd($event)" [disabled]="adding">
+            <mat-icon class="pcard__add-icon">shopping_cart</mat-icon>
+            {{ adding ? 'Adding...' : 'Add to Cart' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+} @else {
+  <div class="pcard pcard--grid" appReveal [revealDelay]="(index % staggerMod) * 55" [revealY]="30" [revealScale]="0.97">
+    <div class="pcard__surface">
+      <div class="pcard__media">
+        @if (showImage()) {
+          <img class="pcard__img" [src]="product.imageUrl" [alt]="product.name" (error)="imgFailed.set(true)" />
+        } @else {
+          <div class="pcard__placeholder">
+            <mat-icon class="pcard__placeholder-icon">image</mat-icon>
+            <span class="pcard__placeholder-text">No Image Available</span>
+          </div>
+        }
+
+        <!-- Wishlist -->
+        <button
+          type="button"
+          class="pcard__wish"
+          [class.pcard__wish--saved]="saved"
+          aria-label="Toggle wishlist"
+          (click)="onWishlist($event)"
+        >
+          <mat-icon class="pcard__wish-icon">{{ saved ? 'favorite' : 'favorite_border' }}</mat-icon>
+        </button>
+      </div>
+
+      <div class="pcard__content">
+        <span class="pcard__category pcard__category--clamp">{{ label() }}</span>
+        <a class="pcard__link" [routerLink]="['/product', product.id]">
+          <h3 class="pcard__title">{{ product.name }}</h3>
+          <div class="pcard__rating">
+            <app-product-rating-badge [skuCode]="product.skuCode" />
+          </div>
+          <div class="pcard__price-row">
+            <span class="pcard__price">{{ formatPrice(product.price) }}</span>
+          </div>
+        </a>
+      </div>
+
+      <div class="pcard__footer">
+        <button mat-flat-button class="pcard__add" (click)="onAdd($event)" [disabled]="adding">
+          <mat-icon class="pcard__add-icon">shopping_cart</mat-icon>
+          {{ adding ? 'Adding...' : 'Add to Cart' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

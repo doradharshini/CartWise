@@ -1,0 +1,117 @@
+<div class="register">
+  <!-- LEFT PANEL — register form -->
+  <div class="register__form-panel">
+    <!-- Mobile brand -->
+    <div class="register__mobile-brand">
+      <div class="register__mobile-brand-box">
+        <mat-icon class="register__mobile-brand-icon">shopping_bag</mat-icon>
+      </div>
+      <span class="register__mobile-brand-name">Cartwise</span>
+    </div>
+
+    <div class="register__content">
+      <div class="register__heading">
+        <h2 class="register__title">Create an account</h2>
+        <p class="register__subtitle">Join Cartwise — it only takes a minute.</p>
+      </div>
+
+      @if (success()) {
+        <div class="register__success">
+          <mat-icon class="register__success-icon">check_circle</mat-icon>
+          Account created! Redirecting to sign in…
+        </div>
+      }
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="register__form" novalidate>
+        @if (apiError()) {
+          <div class="register__error">
+            <mat-icon class="register__error-icon">error_outline</mat-icon>
+            {{ apiError() }}
+          </div>
+        }
+
+        <div class="register__name-row">
+          <mat-form-field appearance="outline" subscriptSizing="dynamic" class="register__field">
+            <mat-label>First Name</mat-label>
+            <input matInput formControlName="firstName" placeholder="John" />
+            @if (c.firstName.touched && c.firstName.invalid) {
+              <mat-error>First name must be at least 2 characters.</mat-error>
+            }
+          </mat-form-field>
+          <mat-form-field appearance="outline" subscriptSizing="dynamic" class="register__field">
+            <mat-label>Last Name</mat-label>
+            <input matInput formControlName="lastName" placeholder="Doe" />
+            @if (c.lastName.touched && c.lastName.invalid) {
+              <mat-error>Last name must be at least 2 characters.</mat-error>
+            }
+          </mat-form-field>
+        </div>
+
+        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="register__field">
+          <mat-label>Username</mat-label>
+          <input matInput formControlName="username" placeholder="johndoe123" autocomplete="username" />
+          @if (c.username.touched && c.username.invalid) {
+            <mat-error>Username must be at least 4 characters.</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="register__field">
+          <mat-label>Email Address</mat-label>
+          <input matInput type="email" formControlName="email" placeholder="name@example.com" autocomplete="email" />
+          @if (c.email.touched && c.email.invalid) {
+            <mat-error>Please enter a valid email address.</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="register__field">
+          <mat-label>Phone Number</mat-label>
+          <input matInput formControlName="phoneNumber" placeholder="+91 98765 43210" autocomplete="tel" />
+          @if (c.phoneNumber.touched && c.phoneNumber.invalid) {
+            <mat-error>Please enter a valid phone number.</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="register__field">
+          <mat-label>Password</mat-label>
+          <input matInput type="password" formControlName="password" placeholder="Min. 8 characters" autocomplete="new-password" />
+          @if (c.password.touched && c.password.invalid) {
+            <mat-error>Password must be at least 8 characters.</mat-error>
+          }
+        </mat-form-field>
+
+        <button mat-flat-button type="submit" [disabled]="isLoading() || success()" class="register__submit">
+          @if (isLoading()) {
+            <span class="register__submit-label">
+              <svg class="register__spinner" viewBox="0 0 24 24" fill="none">
+                <circle class="register__spinner-track" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                <path class="register__spinner-head" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+              </svg>
+              Creating account…
+            </span>
+          } @else {
+            <span class="register__submit-label">Create Account <mat-icon class="register__submit-icon">arrow_forward</mat-icon></span>
+          }
+        </button>
+      </form>
+
+      <p class="register__footer">
+        Already have an account?
+        <a routerLink="/login" class="register__link">Sign in</a>
+      </p>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL — big logo -->
+  <div class="register__brand-panel">
+    <div class="register__brand-gradient"></div>
+    <div class="register__orb register__orb--top-right"></div>
+    <div class="register__orb register__orb--bottom-left"></div>
+
+    <div class="register__brand">
+      <div class="register__brand-box">
+        <mat-icon class="register__brand-icon">shopping_bag</mat-icon>
+      </div>
+      <h1 class="register__brand-name">Cartwise</h1>
+    </div>
+  </div>
+</div>

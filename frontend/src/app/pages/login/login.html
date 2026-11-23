@@ -1,0 +1,77 @@
+<div class="auth">
+  <!-- LEFT PANEL — big logo with adaptive gradient -->
+  <div class="auth__brand-panel">
+    <div class="auth__brand-gradient"></div>
+    <div class="auth__orb auth__orb--top-left"></div>
+    <div class="auth__orb auth__orb--bottom-right"></div>
+
+    <div class="auth__brand">
+      <div class="auth__brand-box">
+        <mat-icon class="auth__brand-icon">shopping_bag</mat-icon>
+      </div>
+      <h1 class="auth__brand-name">Cartwise</h1>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL — login form -->
+  <div class="auth__form-panel">
+    <!-- Mobile brand -->
+    <div class="auth__mobile-brand">
+      <div class="auth__mobile-brand-box">
+        <mat-icon class="auth__mobile-brand-icon">shopping_bag</mat-icon>
+      </div>
+      <span class="auth__mobile-brand-name">Cartwise</span>
+    </div>
+
+    <div class="auth__content">
+      <div class="auth__heading">
+        <h2 class="auth__title">Welcome back</h2>
+        <p class="auth__subtitle">Sign in to your Cartwise account</p>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="auth__form" novalidate>
+        @if (apiError()) {
+          <div class="auth__error">
+            <mat-icon class="auth__error-icon">error_outline</mat-icon>
+            {{ apiError() }}
+          </div>
+        }
+
+        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="auth__field">
+          <mat-label>Email Address</mat-label>
+          <input matInput type="email" formControlName="email" placeholder="name@example.com" autocomplete="email" />
+          @if (email.touched && email.invalid) {
+            <mat-error>Please enter a valid email address.</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="auth__field">
+          <mat-label>Password</mat-label>
+          <input matInput type="password" formControlName="password" placeholder="••••••••" autocomplete="current-password" />
+          @if (password.touched && password.invalid) {
+            <mat-error>Password is required.</mat-error>
+          }
+        </mat-form-field>
+
+        <button mat-flat-button type="submit" [disabled]="isLoading()" class="auth__submit">
+          @if (isLoading()) {
+            <span class="auth__submit-label">
+              <svg class="auth__spinner" viewBox="0 0 24 24" fill="none">
+                <circle class="auth__spinner-track" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                <path class="auth__spinner-head" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+              </svg>
+              Signing in…
+            </span>
+          } @else {
+            <span class="auth__submit-label">Sign In <mat-icon class="auth__submit-icon">arrow_forward</mat-icon></span>
+          }
+        </button>
+      </form>
+
+      <p class="auth__footer">
+        Don't have an account?
+        <a routerLink="/register" class="auth__link">Create one</a>
+      </p>
+    </div>
+  </div>
+</div>

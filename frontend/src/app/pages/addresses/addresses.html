@@ -1,0 +1,163 @@
+@if (isLoading()) {
+  <div class="addr-skeleton">
+    <div class="addr-skeleton__back"></div>
+    <div class="addr-skeleton__title"></div>
+    <div class="addr-skeleton__subtitle"></div>
+    <div class="addr-grid">
+      @for (i of skeletonCards; track i) {
+        <div class="addr-skeleton__card" [style.opacity]="1 - (i - 1) * 0.2"></div>
+      }
+    </div>
+  </div>
+} @else {
+  <div class="addr-page">
+    @if (notification().show) {
+      <div class="addr-toast">
+        <div
+          class="addr-toast__body"
+          [class.addr-toast__body--error]="notification().type === 'error'"
+          [class.addr-toast__body--info]="notification().type !== 'error'"
+        >
+          <mat-icon>{{ notification().type === 'error' ? 'error_outline' : 'check_circle' }}</mat-icon>
+          {{ notification().message }}
+        </div>
+      </div>
+    }
+
+    <main class="addr-main">
+      <button class="addr-back" (click)="back()">
+        <mat-icon class="addr-back__icon">arrow_back</mat-icon> Back
+      </button>
+
+      <div class="addr-header">
+        <div class="addr-header__text">
+          <h1 class="addr-header__title">Saved Addresses</h1>
+          <p class="addr-header__subtitle">Manage your shipping addresses for a faster checkout.</p>
+        </div>
+        @if (!showForm()) {
+          <button mat-flat-button class="addr-btn addr-btn--primary" (click)="showForm.set(true)">
+            <mat-icon>add</mat-icon> Add New Address
+          </button>
+        }
+      </div>
+
+      @if (error()) {
+        <div class="addr-error">{{ error() }}</div>
+      }
+
+      @if (showForm()) {
+        <div class="addr-form-wrap">
+          <mat-card appearance="outlined" class="addr-form-card">
+            <div class="addr-form-card__head">
+              <div class="addr-form-card__head-row">
+                <h2 class="addr-form-card__title">
+                  <mat-icon class="addr-form-card__title-icon">place</mat-icon>
+                  Add a New Address
+                </h2>
+                <button mat-icon-button class="addr-form-card__close" (click)="showForm.set(false)" aria-label="Close">
+                  <mat-icon>close</mat-icon>
+                </button>
+              </div>
+              <p class="addr-form-card__desc">Enter your delivery details below.</p>
+            </div>
+
+            <div class="addr-form-card__body">
+              <form class="addr-form" ngNativeValidate (ngSubmit)="handleSubmit()">
+                <div class="addr-form__field">
+                  <label class="addr-form__label">Street Address</label>
+                  <input class="addr-form__input" name="street" [(ngModel)]="formData.street" required placeholder="123 Main St, Apt 4B" />
+                </div>
+
+                <div class="addr-form__row">
+                  <div class="addr-form__field">
+                    <label class="addr-form__label">City</label>
+                    <input class="addr-form__input" name="city" [(ngModel)]="formData.city" required placeholder="Indore" />
+                  </div>
+                  <div class="addr-form__field">
+                    <label class="addr-form__label">State / Province</label>
+                    <input class="addr-form__input" name="state" [(ngModel)]="formData.state" required placeholder="Madhya Pradesh" />
+                  </div>
+                </div>
+
+                <div class="addr-form__row">
+                  <div class="addr-form__field">
+                    <label class="addr-form__label">ZIP / Postal Code</label>
+                    <input class="addr-form__input" name="zipCode" [(ngModel)]="formData.zipCode" required placeholder="452001" />
+                  </div>
+                  <div class="addr-form__field">
+                    <label class="addr-form__label">Country</label>
+                    <input class="addr-form__input" name="country" [(ngModel)]="formData.country" required placeholder="India" />
+                  </div>
+                </div>
+
+                <div class="addr-form__actions">
+                  <button mat-stroked-button type="button" class="addr-btn" (click)="showForm.set(false)">Cancel</button>
+                  <button
+                    mat-flat-button
+                    type="submit"
+                    class="addr-btn addr-btn--primary addr-btn--save"
+                    [disabled]="isSubmitting()"
+                  >
+                    @if (isSubmitting()) {
+                      <span class="addr-btn__saving"><mat-spinner diameter="14" /> Saving…</span>
+                    } @else {
+                      Save Address
+                    }
+                  </button>
+                </div>
+              </form>
+            </div>
+          </mat-card>
+        </div>
+      }
+
+      @if (!showForm() && addresses().length === 0) {
+        <div class="addr-empty">
+          <div class="addr-empty__float">
+            <div class="addr-empty__badge">
+              <mat-icon class="addr-empty__icon">place</mat-icon>
+            </div>
+          </div>
+          <h2 class="addr-empty__title">No addresses saved</h2>
+          <p class="addr-empty__text">
+            You haven't added any shipping addresses yet. Add one now to speed up your next checkout.
+          </p>
+          <button mat-flat-button class="addr-btn addr-btn--primary" (click)="showForm.set(true)">
+            <mat-icon>add</mat-icon> Add New Address
+          </button>
+        </div>
+      }
+
+      @if (addresses().length > 0) {
+        <div class="addr-grid">
+          @for (addr of addresses(); track addr.id; let i = $index) {
+            <div class="addr-card-wrap addr-card-wrap--{{ accent(i) }}" [style.animation-delay.ms]="i * 70">
+              <mat-card appearance="outlined" class="addr-card">
+                <div class="addr-card__top-bar"></div>
+                <div class="addr-card__stripe"></div>
+
+                <div class="addr-card__content">
+                  <div class="addr-card__row">
+                    <div class="addr-card__icon-circle">
+                      <mat-icon class="addr-card__icon">home</mat-icon>
+                    </div>
+                    <div class="addr-card__text">
+                      <span class="addr-card__street">{{ addr.street }}</span>
+                      <span class="addr-card__details">
+                        {{ addr.city }}, {{ addr.state }} {{ addr.zipCode }}<br />
+                        {{ addr.country }}
+                      </span>
+                    </div>
+                  </div>
+                  <div class="addr-card__footer">
+                    <span class="addr-card__badge">Address {{ i + 1 }}</span>
+                  </div>
+                </div>
+              </mat-card>
+            </div>
+          }
+        </div>
+      }
+    </main>
+  </div>
+}

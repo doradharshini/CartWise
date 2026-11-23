@@ -1,0 +1,150 @@
+@if (isLoading()) {
+  <div class="orders-page">
+    <main class="orders-main">
+      <div class="orders-skeleton orders-skeleton--header">
+        <div class="orders-skeleton__heading">
+          <div class="orders-skeleton__bar orders-skeleton__bar--title"></div>
+          <div class="orders-skeleton__bar orders-skeleton__bar--subtitle"></div>
+        </div>
+        <div class="orders-skeleton__controls">
+          <div class="orders-skeleton__bar orders-skeleton__bar--search"></div>
+          <div class="orders-skeleton__bar orders-skeleton__bar--filter"></div>
+        </div>
+      </div>
+      <div class="orders-skeleton orders-skeleton--tabs">
+        @for (t of STATUS_TABS; track t; let i = $index) {
+          <div class="orders-skeleton__bar orders-skeleton__bar--tab" [style.opacity]="1 - i * 0.15"></div>
+        }
+      </div>
+      <div class="orders-list">
+        @for (i of skeletonRows; track i) {
+          <div class="orders-skeleton orders-skeleton__card" [style.opacity]="1 - (i - 1) * 0.15">
+            <div class="orders-skeleton__card-top">
+              <div class="orders-skeleton__card-left">
+                <div class="orders-skeleton__heading">
+                  <div class="orders-skeleton__bar orders-skeleton__bar--id"></div>
+                  <div class="orders-skeleton__bar orders-skeleton__bar--date"></div>
+                </div>
+                <div class="orders-skeleton__bar orders-skeleton__bar--pill"></div>
+              </div>
+              <div class="orders-skeleton__bar orders-skeleton__bar--price"></div>
+            </div>
+            <div class="orders-skeleton__rule"></div>
+            <div class="orders-skeleton__card-bottom">
+              <div class="orders-skeleton__thumbs">
+                @for (j of skeletonRows; track j) {
+                  <div class="orders-skeleton__bar orders-skeleton__bar--thumb"></div>
+                }
+              </div>
+              <div class="orders-skeleton__thumbs">
+                <div class="orders-skeleton__bar orders-skeleton__bar--action"></div>
+                <div class="orders-skeleton__bar orders-skeleton__bar--action-sm"></div>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    </main>
+  </div>
+} @else {
+  <div class="orders-page orders-page--relative">
+    @if (notification().show) {
+      <div class="orders-toast">
+        <div
+          class="orders-toast__body"
+          [class.orders-toast__body--error]="notification().type === 'error'"
+          [class.orders-toast__body--info]="notification().type !== 'error'"
+        >
+          <mat-icon class="orders-toast__icon">{{ notification().type === 'error' ? 'error_outline' : 'check_circle' }}</mat-icon>
+          {{ notification().message }}
+        </div>
+      </div>
+    }
+
+    <main class="orders-main">
+      <!-- Header -->
+      <div class="orders-header">
+        <div class="orders-header__text">
+          <h1 class="orders-header__title">My Orders</h1>
+          <p class="orders-header__subtitle">Track and manage all your secure purchases</p>
+        </div>
+
+        <div class="orders-header__controls">
+          <div class="orders-search">
+            <mat-icon class="orders-search__icon">search</mat-icon>
+            <input
+              class="orders-search__input"
+              placeholder="Search order ID or SKU…"
+              [ngModel]="searchQuery()"
+              (ngModelChange)="searchQuery.set($event)"
+            />
+            @if (searchQuery()) {
+              <button class="orders-search__clear" (click)="searchQuery.set('')" aria-label="Clear search">
+                <mat-icon class="orders-search__clear-icon">close</mat-icon>
+              </button>
+            }
+          </div>
+          <button mat-stroked-button class="orders-header__filter"><mat-icon>tune</mat-icon> Filter</button>
+        </div>
+      </div>
+
+      <!-- Filter tabs -->
+      <div class="orders-tabs">
+        @for (group of STATUS_TABS; track group) {
+          <button
+            class="orders-tab"
+            [class.orders-tab--active]="activeFilter() === group"
+            (click)="activeFilter.set(group)"
+          >
+            <span class="orders-tab__label">{{ group === 'ALL' ? 'All Orders' : group.toLowerCase() }}</span>
+            <span class="orders-tab__count">{{ getCountForStatus(group) }}</span>
+          </button>
+        }
+      </div>
+
+      @if (error()) {
+        <div class="orders-error">{{ error() }}</div>
+      }
+
+      <!-- List -->
+      @if (filteredOrders().length === 0) {
+        <div class="orders-empty">
+          <div class="orders-empty__float">
+            <div class="orders-empty__badge">
+              <mat-icon class="orders-empty__icon">shopping_bag</mat-icon>
+            </div>
+          </div>
+          <h3 class="orders-empty__title">No matching orders found</h3>
+          <p class="orders-empty__text">
+            There are no matching transaction history updates under this selection right now.
+          </p>
+          @if (searchQuery() || activeFilter() !== 'ALL') {
+            <button mat-stroked-button class="orders-empty__clear" (click)="clearFilters()">Clear filters</button>
+          }
+        </div>
+      } @else {
+        <div class="orders-list">
+          @for (order of filteredOrders(); track order.id; let i = $index) {
+            <app-order-card
+              [order]="order"
+              [style.animation-delay.ms]="i * 60"
+              (view)="view(order)"
+              (review)="openReview($event)"
+            />
+          }
+        </div>
+      }
+
+      <!-- Pagination footer -->
+      @if (filteredOrders().length > 0) {
+        <div class="orders-footer">
+          <span class="orders-footer__text">Showing {{ filteredOrders().length }} of {{ orders().length }} orders</span>
+          <div class="orders-footer__buttons">
+            <button mat-stroked-button disabled class="orders-footer__btn"><mat-icon>chevron_left</mat-icon> Previous</button>
+            <button mat-stroked-button disabled class="orders-footer__btn">Next <mat-icon iconPositionEnd>chevron_right</mat-icon></button>
+          </div>
+        </div>
+      }
+    </main>
+  </div>
+}

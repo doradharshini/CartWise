@@ -1,0 +1,247 @@
+@if (isLoading()) {
+  <div class="pd-loading">
+    <div class="pd-loading__bone pd-loading__bone--back"></div>
+    <div class="pd-loading__grid">
+      <div class="pd-loading__bone pd-loading__bone--image"></div>
+      <div class="pd-loading__info">
+        <div class="pd-loading__bone pd-loading__bone--title"></div>
+        <div class="pd-loading__bone pd-loading__bone--block"></div>
+        <div class="pd-loading__actions">
+          <div class="pd-loading__bone pd-loading__bone--button"></div>
+          <div class="pd-loading__bone pd-loading__bone--button"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+} @else if (error() || !product()) {
+  <div class="pd-error">
+    <mat-icon class="pd-error__icon">error_outline</mat-icon>
+    <h2 class="pd-error__title">Oops!</h2>
+    <p class="pd-error__message">{{ error() }}</p>
+    <button mat-stroked-button (click)="back()">Back to Catalog</button>
+  </div>
+} @else {
+  @let p = product();
+  <div class="pd">
+    <!-- Toast -->
+    @if (notification().show) {
+      <div class="pd-toast">
+        <div
+          class="pd-toast__body"
+          [class.pd-toast__body--error]="notification().type === 'error'"
+          [class.pd-toast__body--success]="notification().type !== 'error'"
+        >
+          <mat-icon class="pd-toast__icon">{{ notification().type === 'error' ? 'error_outline' : 'check_circle' }}</mat-icon>
+          {{ notification().message }}
+        </div>
+      </div>
+    }
+
+    <!-- Image zoom overlay -->
+    @if (zoomed() && activeImageUrl() && !imgError()) {
+      <div class="pd-zoom" (click)="zoomed.set(false)">
+        @for (k of [activeImageIndex()]; track k) {
+          <img class="pd-zoom__img" [src]="activeImageUrl()" [alt]="p.name" (click)="$event.stopPropagation()" />
+        }
+        @if (images().length > 1) {
+          <button
+            type="button"
+            (click)="$event.stopPropagation(); goPrev()"
+            class="pd-zoom__nav pd-zoom__nav--prev"
+            aria-label="Previous image"
+          >
+            <mat-icon>chevron_left</mat-icon>
+          </button>
+          <button
+            type="button"
+            (click)="$event.stopPropagation(); goNext()"
+            class="pd-zoom__nav pd-zoom__nav--next"
+            aria-label="Next image"
+          >
+            <mat-icon>chevron_right</mat-icon>
+          </button>
+          <span class="pd-zoom__counter" (click)="$event.stopPropagation()">{{ activeImageIndex() + 1 }} / {{ images().length }}</span>
+        }
+      </div>
+    }
+
+    <main class="pd__main">
+      <!-- Back -->
+      <button type="button" (click)="back()" class="pd__back">
+        <mat-icon class="pd__back-icon">arrow_back</mat-icon> Back to Catalog
+      </button>
+
+      <div class="pd__grid">
+        <!-- LEFT: image panel -->
+        <div class="pd-gallery">
+          <div class="pd-gallery__stage" [class.pd-gallery__stage--zoomable]="activeImageUrl() && !imgError()">
+            @if (activeImageUrl() && !imgError()) {
+              @for (k of [activeImageIndex()]; track k) {
+                <img
+                  class="pd-gallery__image"
+                  [src]="activeImageUrl()"
+                  [alt]="p.name"
+                  draggable="false"
+                  (error)="imgError.set(true)"
+                  (click)="zoomed.set(true)"
+                  (pointerdown)="onPointerDown($event)"
+                  (pointerup)="onPointerUp($event)"
+                  (pointercancel)="onPointerUp($event)"
+                />
+              }
+            } @else {
+              <div class="pd-gallery__placeholder">
+                <mat-icon class="pd-gallery__placeholder-icon">image</mat-icon>
+                <span class="pd-gallery__placeholder-text">No Image Available</span>
+              </div>
+            }
+
+            @if (images().length > 1) {
+              <button
+                type="button"
+                (click)="$event.stopPropagation(); goPrev()"
+                class="pd-gallery__arrow pd-gallery__arrow--prev"
+                aria-label="Previous image"
+              >
+                <mat-icon class="pd-gallery__arrow-icon">chevron_left</mat-icon>
+              </button>
+              <button
+                type="button"
+                (click)="$event.stopPropagation(); goNext()"
+                class="pd-gallery__arrow pd-gallery__arrow--next"
+                aria-label="Next image"
+              >
+                <mat-icon class="pd-gallery__arrow-icon">chevron_right</mat-icon>
+              </button>
+
+              <!-- Dot indicators -->
+              <div class="pd-gallery__dots">
+                @for (url of images(); track $index) {
+                  <button
+                    type="button"
+                    (click)="$event.stopPropagation(); goToImage($index)"
+                    class="pd-gallery__dot"
+                    [class.pd-gallery__dot--active]="$index === activeImageIndex()"
+                    [attr.aria-label]="'Show image ' + ($index + 1)"
+                  ></button>
+                }
+              </div>
+            }
+
+            <!-- Zoom hint -->
+            @if (activeImageUrl() && !imgError()) {
+              <div class="pd-gallery__zoom-hint">
+                <mat-icon class="pd-gallery__zoom-hint-icon">zoom_in</mat-icon> Click to zoom
+              </div>
+            }
+
+            <!-- Wishlist button -->
+            <div class="pd-gallery__wishlist" [class.pd-gallery__wishlist--bounce]="wishlistBounce()">
+              <button mat-mini-fab type="button" class="pd-gallery__wishlist-btn" (click)="handleWishlist($event)" aria-label="Toggle wishlist">
+                <mat-icon class="pd-gallery__heart" [class.pd-gallery__heart--saved]="saved()">{{
+                  saved() ? 'favorite' : 'favorite_border'
+                }}</mat-icon>
+              </button>
+            </div>
+          </div>
+
+          <!-- Thumbnail strip -->
+          @if (images().length > 1) {
+            <div class="pd-gallery__thumbs">
+              @for (url of images(); track $index) {
+                <button
+                  type="button"
+                  (click)="goToImage($index)"
+                  class="pd-gallery__thumb"
+                  [class.pd-gallery__thumb--active]="$index === activeImageIndex()"
+                >
+                  <img [src]="url" [alt]="p.name + ' ' + ($index + 1)" class="pd-gallery__thumb-img" />
+                </button>
+              }
+            </div>
+          }
+
+          <!-- Trust row -->
+          <div class="pd-trust">
+            @for (t of trustItems; track t.label) {
+              <div class="pd-trust__item">
+                <mat-icon class="pd-trust__icon">{{ t.icon }}</mat-icon>
+                <span class="pd-trust__label">{{ t.label }}</span>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- RIGHT: info panel -->
+        <div class="pd-info">
+          <div class="pd-info__row pd-info__row--meta">
+            <span class="pd-info__category">{{ categoryName() }}</span>
+            <span class="pd-info__dot">·</span>
+            <span class="pd-info__sku">SKU: {{ p.skuCode }}</span>
+          </div>
+
+          <h1 class="pd-info__name pd-info__row" style="--i: 1">{{ p.name }}</h1>
+
+          @if (p.shopName) {
+            <div class="pd-info__seller pd-info__row" style="--i: 2">
+              <mat-icon class="pd-info__seller-icon">storefront</mat-icon>
+              Fulfilled by
+              <span class="pd-info__seller-name">{{ p.shopName }}</span>
+            </div>
+          }
+
+          <div class="pd-info__price-row pd-info__row" style="--i: 3">
+            <span class="pd-info__price">{{ formatPrice(p.price) }}</span>
+            <span class="pd-info__stock">In Stock</span>
+          </div>
+
+          @if (p.description) {
+            <p class="pd-info__description pd-info__row" style="--i: 4">{{ p.description }}</p>
+          }
+
+          <!-- Quantity -->
+          <div class="pd-info__qty-row pd-info__row" style="--i: 5">
+            <span class="pd-info__qty-label">Quantity</span>
+            <div class="pd-qty">
+              <button type="button" (click)="decQty()" [disabled]="quantity() <= 1" class="pd-qty__btn" aria-label="Decrease quantity">
+                <mat-icon class="pd-qty__icon">remove</mat-icon>
+              </button>
+              @for (q of [quantity()]; track q) {
+                <span class="pd-qty__value">{{ q }}</span>
+              }
+              <button type="button" (click)="incQty()" [disabled]="quantity() >= 20" class="pd-qty__btn" aria-label="Increase quantity">
+                <mat-icon class="pd-qty__icon">add</mat-icon>
+              </button>
+            </div>
+          </div>
+
+          <!-- CTAs -->
+          <div class="pd-info__ctas pd-info__row" style="--i: 6">
+            <div class="pd-info__cta">
+              <button mat-stroked-button class="pd-info__cart-btn" (click)="handleAddToCart()" [disabled]="isAdding()">
+                <mat-icon>shopping_cart</mat-icon>
+                {{ isAdding() ? 'Adding...' : 'Add to Cart' }}
+              </button>
+            </div>
+            <div class="pd-info__cta">
+              <button mat-flat-button class="pd-info__buy-btn" (click)="buyNow()">Buy Now</button>
+            </div>
+          </div>
+
+          <!-- Wishlist text link -->
+          <button type="button" (click)="handleWishlist($event)" class="pd-info__wishlist-link pd-info__row" style="--i: 7">
+            <mat-icon class="pd-info__wishlist-icon" [class.pd-info__wishlist-icon--saved]="saved()">{{
+              saved() ? 'favorite' : 'favorite_border'
+            }}</mat-icon>
+            {{ saved() ? 'Saved to Wishlist' : 'Save to Wishlist' }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Customer reviews -->
+      <div class="pd__reviews">
+        <app-product-reviews [skuCode]="p.skuCode" />
+      </div>
+    </main>
+  </div>
+}

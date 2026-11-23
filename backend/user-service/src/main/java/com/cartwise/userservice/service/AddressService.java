@@ -1,0 +1,58 @@
+package com.cartwise.userservice.service;
+
+
+import com.cartwise.userservice.dto.request.AddressRequest;
+import com.cartwise.userservice.dto.response.AddressResponse;
+import com.cartwise.userservice.entity.Address;
+import com.cartwise.userservice.exception.ResourceNotFoundException;
+import com.cartwise.userservice.repository.AddressRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.UUID;
+
+@Service
+@RequiredArgsConstructor
+public class AddressService {
+
+    private final AddressRepository addressRepository;
+
+    public AddressResponse addAddress(String userId, AddressRequest request) {
+        Address address = Address.builder()
+                .userId(userId)
+                .street(request.street())
+                .city(request.city())
+                .state(request.state())
+                .zipCode(request.zipCode())
+                .country(request.country())
+                .build();
+
+        Address savedAddress = addressRepository.save(address);
+        return mapToResponse(savedAddress);
+    }
+
+    public List<AddressResponse> getUserAddresses(String userId) {
+        return addressRepository.findByUserId(userId)
+                .stream()
+                .map(this::mapToResponse)
+                .toList();
+    }
+
+    public AddressResponse getAddressById(UUID addressId, String userId) {
+        Address address = addressRepository.findByIdAndUserId(addressId, userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Address not found or does not belong to user"));
+        return mapToResponse(address);
+    }
+
+    private AddressResponse mapToResponse(Address address) {
+        return new AddressResponse(
+                address.getId(),
+                address.getStreet(),
+                address.getCity(),
+                address.getState(),
+                address.getZipCode(),
+                address.getCountry()
+        );
+    }
+}

@@ -1,0 +1,162 @@
+@if (isLoading()) {
+  <div class="checkout-page checkout-page--loading">
+    <div class="checkout-skeleton">
+      <div class="checkout-skeleton__title"></div>
+      <div class="checkout-layout">
+        <div class="checkout-skeleton__left">
+          <div class="checkout-skeleton__block checkout-skeleton__block--tall"></div>
+          <div class="checkout-skeleton__block checkout-skeleton__block--short"></div>
+        </div>
+        <div class="checkout-skeleton__summary"></div>
+      </div>
+    </div>
+  </div>
+} @else {
+  <div class="checkout-page">
+    @if (notification().show) {
+      <div class="checkout-toast">
+        <div
+          class="checkout-toast__body"
+          [class.checkout-toast__body--error]="notification().type === 'error'"
+          [class.checkout-toast__body--info]="notification().type !== 'error'"
+        >
+          <mat-icon class="checkout-toast__icon">{{ notification().type === 'error' ? 'error_outline' : 'check_circle' }}</mat-icon>
+          {{ notification().message }}
+        </div>
+      </div>
+    }
+
+    <main class="checkout-main">
+      <!-- Header -->
+      <div class="checkout-header">
+        <div>
+          <h1 class="checkout-header__title">Checkout</h1>
+          <p class="checkout-header__subtitle">Complete your purchase securely</p>
+        </div>
+        <button class="checkout-header__back" (click)="goCart()">
+          <mat-icon class="checkout-icon checkout-icon--sm">arrow_back</mat-icon> Back to cart
+        </button>
+      </div>
+
+      <!-- Trust bar -->
+      <div class="checkout-trust">
+        @for (t of trustItems; track t.label) {
+          <div class="checkout-trust__item">
+            <mat-icon class="checkout-trust__icon">{{ t.icon }}</mat-icon>
+            {{ t.label }}
+          </div>
+        }
+      </div>
+
+      <div class="checkout-layout">
+        <!-- Left column -->
+        <div class="checkout-left">
+          <!-- Shipping -->
+          <section class="checkout-section">
+            <div class="checkout-section__head">
+              <div class="checkout-section__icon-box">
+                <mat-icon class="checkout-icon checkout-icon--sm checkout-section__icon">local_shipping</mat-icon>
+              </div>
+              <div>
+                <h2 class="checkout-section__title">Shipping Address</h2>
+                <p class="checkout-section__desc">Select where you want your order delivered.</p>
+              </div>
+            </div>
+
+            <div class="checkout-section__body">
+              <div class="checkout-addresses">
+                @for (addr of addresses(); track addr.id; let i = $index) {
+                  <div
+                    class="checkout-address"
+                    [class.checkout-address--selected]="selectedAddressId() === addr.id"
+                    [style.animation-delay.ms]="i * 60"
+                    (click)="selectedAddressId.set(addr.id)"
+                  >
+                    <div class="checkout-address__top">
+                      <span class="checkout-address__tag">
+                        <mat-icon class="checkout-address__tag-icon">place</mat-icon> Address
+                      </span>
+                      @if (selectedAddressId() === addr.id) {
+                        <div class="checkout-check">
+                          <mat-icon class="checkout-check__icon">check</mat-icon>
+                        </div>
+                      }
+                    </div>
+                    <p class="checkout-address__street">{{ addr.street }}</p>
+                    <p class="checkout-address__details">
+                      {{ addr.city }}, {{ addr.state }}<br />
+                      {{ addr.zipCode }}, {{ addr.country }}
+                    </p>
+                  </div>
+                }
+
+                <button class="checkout-add-address" (click)="goAddresses()">
+                  <div class="checkout-add-address__circle">
+                    <mat-icon class="checkout-icon checkout-icon--sm">add</mat-icon>
+                  </div>
+                  <span class="checkout-add-address__label">Add new address</span>
+                </button>
+              </div>
+            </div>
+          </section>
+
+          <!-- Payment method -->
+          <section class="checkout-section">
+            <div class="checkout-section__head">
+              <div class="checkout-section__icon-box">
+                <mat-icon class="checkout-icon checkout-icon--sm checkout-section__icon">credit_card</mat-icon>
+              </div>
+              <div>
+                <h2 class="checkout-section__title">Payment Method</h2>
+                <p class="checkout-section__desc">Choose how you'd like to pay.</p>
+              </div>
+            </div>
+
+            <div class="checkout-section__body checkout-payments">
+              @for (opt of paymentOptions; track opt.value) {
+                <div
+                  class="checkout-payment"
+                  [class.checkout-payment--selected]="paymentMethod() === opt.value"
+                  (click)="paymentMethod.set(opt.value)"
+                >
+                  <div class="checkout-payment__icon-box">
+                    <mat-icon class="checkout-icon checkout-icon--sm checkout-payment__icon">{{ opt.icon }}</mat-icon>
+                  </div>
+                  <div>
+                    <p class="checkout-payment__label">{{ opt.label }}</p>
+                    <p class="checkout-payment__sub">{{ opt.sub }}</p>
+                  </div>
+                  @if (paymentMethod() === opt.value) {
+                    <div class="checkout-check checkout-check--end">
+                      <mat-icon class="checkout-check__icon">check</mat-icon>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          </section>
+        </div>
+
+        <!-- Right column: summary -->
+        <app-checkout-summary
+          class="checkout-right"
+          [items]="cartItems()"
+          [hasAddresses]="addresses().length > 0"
+          [subtotal]="subtotal()"
+          [discountAmount]="discountAmount()"
+          [appliedCoupon]="appliedCoupon()"
+          [deliveryFee]="deliveryFee()"
+          [platformFee]="platformFee()"
+          [total]="total()"
+          [freeDeliveryThreshold]="FREE_DELIVERY_THRESHOLD"
+          [isApplyingCoupon]="isApplyingCoupon()"
+          [isPlacingOrder]="isPlacingOrder()"
+          [(couponCode)]="couponCode"
+          (applyCoupon)="handleApplyCoupon()"
+          (removeCoupon)="removeCoupon()"
+          (placeOrder)="handlePlaceOrder()"
+        />
+      </div>
+    </main>
+  </div>
+}

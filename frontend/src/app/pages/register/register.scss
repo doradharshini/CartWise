@@ -1,0 +1,399 @@
+:host {
+  display: block;
+}
+
+.register {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+  background: #fff;
+
+  // ── Form panel ──
+  &__form-panel {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 1.5rem;
+    overflow-y: auto;
+    background: #fff;
+  }
+
+  &__mobile-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    margin-bottom: 2rem;
+  }
+
+  &__mobile-brand-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: var(--radius-full);
+    background: var(--neutral-900);
+  }
+
+  &__mobile-brand-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    font-size: 1.25rem;
+    color: #fff;
+  }
+
+  &__mobile-brand-name {
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+    font-weight: 900;
+    letter-spacing: -0.025em;
+    color: var(--neutral-900);
+  }
+
+  &__content {
+    width: 100%;
+    max-width: 28rem;
+  }
+
+  &__heading {
+    margin-bottom: 2rem;
+  }
+
+  &__title {
+    font-size: 1.875rem;
+    line-height: 2.25rem;
+    font-weight: 900;
+    letter-spacing: -0.025em;
+    color: var(--neutral-900);
+  }
+
+  &__subtitle {
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    font-weight: 700;
+    color: var(--neutral-500);
+  }
+
+  &__success {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    font-weight: 700;
+    color: var(--emerald-700);
+    background: var(--emerald-50);
+    border: 1px solid var(--emerald-200);
+    border-radius: var(--radius-xl);
+    animation: flashIn 0.3s ease both;
+  }
+
+  &__success-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    font-size: 1.25rem;
+  }
+
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  &__name-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+
+  &__field {
+    width: 100%;
+  }
+
+  &__error {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+    padding: 0.875rem;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    font-weight: 700;
+    color: var(--red-600);
+    background: var(--red-50);
+    border: 1px solid var(--red-200);
+    border-radius: var(--radius-xl);
+  }
+
+  &__error-icon {
+    width: 1rem;
+    height: 1rem;
+    font-size: 1rem;
+  }
+
+  &__submit {
+    --mat-button-filled-container-color: var(--neutral-900);
+    --mat-button-filled-label-text-color: #fff;
+    --mat-button-filled-container-shape: var(--radius-full);
+    --mat-button-filled-container-height: 3rem;
+    width: 100%;
+    margin-top: 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 700;
+    box-shadow: var(--shadow-md);
+  }
+
+  &__submit-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  &__submit-icon {
+    width: 1rem;
+    height: 1rem;
+    font-size: 1rem;
+  }
+
+  &__spinner {
+    width: 1rem;
+    height: 1rem;
+    animation: spin 1s linear infinite;
+  }
+
+  &__spinner-track {
+    opacity: 0.25;
+  }
+
+  &__spinner-head {
+    opacity: 0.75;
+  }
+
+  &__footer {
+    margin-top: 1.75rem;
+    text-align: center;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    font-weight: 500;
+    color: var(--neutral-500);
+  }
+
+  &__link {
+    font-weight: 700;
+    color: var(--neutral-900);
+    text-underline-offset: 4px;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  // ── Brand panel (desktop only) ──
+  &__brand-panel {
+    position: relative;
+    display: none;
+    width: 50%;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: var(--neutral-50);
+    transition: background-color 0.5s;
+  }
+
+  &__brand-gradient {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to bottom left,
+      color-mix(in oklab, var(--blue-200) 50%, transparent),
+      var(--neutral-50),
+      color-mix(in oklab, var(--emerald-200) 50%, transparent)
+    );
+    transition: background 0.5s;
+  }
+
+  &__orb {
+    position: absolute;
+    width: 24rem;
+    height: 24rem;
+    border-radius: var(--radius-full);
+    filter: blur(100px);
+    pointer-events: none;
+
+    &--top-right {
+      top: -8rem;
+      right: -8rem;
+      background: color-mix(in oklab, var(--blue-400) 30%, transparent);
+    }
+
+    &--bottom-left {
+      bottom: -8rem;
+      left: -8rem;
+      background: color-mix(in oklab, var(--emerald-400) 30%, transparent);
+    }
+  }
+
+  &__brand {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    animation: brandIn 0.5s ease both;
+  }
+
+  &__brand-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 6rem;
+    height: 6rem;
+    border-radius: 2rem;
+    background: var(--neutral-900);
+    box-shadow: var(--shadow-2xl);
+    transition: background-color 0.5s, box-shadow 0.5s;
+  }
+
+  &__brand-icon {
+    width: 3rem;
+    height: 3rem;
+    font-size: 3rem;
+    color: #fff;
+    transition: color 0.5s;
+  }
+
+  &__brand-name {
+    font-size: 3rem;
+    line-height: 1;
+    font-weight: 900;
+    letter-spacing: -0.025em;
+    color: var(--neutral-900);
+    transition: color 0.5s;
+  }
+}
+
+@media (min-width: 1024px) {
+  .register {
+    &__form-panel {
+      width: 50%;
+    }
+
+    &__mobile-brand {
+      display: none;
+    }
+
+    &__brand-panel {
+      display: flex;
+    }
+  }
+}
+
+// ── Dark mode ──
+:host-context(.dark) {
+  .register {
+    background: var(--neutral-950);
+
+    &__form-panel,
+    &__brand-panel {
+      background: var(--neutral-950);
+    }
+
+    &__mobile-brand-box,
+    &__brand-box {
+      background: #fff;
+    }
+
+    &__brand-box {
+      box-shadow: 0 0 60px rgba(255, 255, 255, 0.1);
+    }
+
+    &__mobile-brand-icon {
+      color: var(--neutral-900);
+    }
+
+    &__brand-icon {
+      color: var(--neutral-950);
+    }
+
+    &__brand-name {
+      color: #fff;
+    }
+
+    &__mobile-brand-name,
+    &__title {
+      color: var(--neutral-100);
+    }
+
+    &__subtitle,
+    &__footer {
+      color: var(--neutral-400);
+    }
+
+    &__link {
+      color: var(--neutral-100);
+    }
+
+    &__success {
+      color: var(--emerald-400);
+      background: color-mix(in oklab, var(--emerald-950) 50%, transparent);
+      border-color: var(--emerald-800);
+    }
+
+    &__error {
+      color: var(--red-400);
+      background: color-mix(in oklab, var(--red-950) 50%, transparent);
+      border-color: var(--red-900);
+    }
+
+    &__brand-gradient {
+      background: linear-gradient(
+        to bottom left,
+        color-mix(in oklab, var(--blue-900) 30%, transparent),
+        var(--neutral-950),
+        color-mix(in oklab, var(--emerald-900) 30%, transparent)
+      );
+    }
+
+    &__orb--top-right {
+      background: color-mix(in oklab, var(--blue-600) 20%, transparent);
+    }
+
+    &__orb--bottom-left {
+      background: color-mix(in oklab, var(--emerald-600) 20%, transparent);
+    }
+
+    &__submit {
+      --mat-button-filled-container-color: #fff;
+      --mat-button-filled-label-text-color: var(--neutral-900);
+    }
+  }
+}
+
+@keyframes brandIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes flashIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .register__brand,
+  .register__success,
+  .register__spinner {
+    animation: none;
+  }
+}

@@ -1,0 +1,63 @@
+<div class="backdrop" (click)="closed.emit()" (keydown.escape)="closed.emit()" tabindex="-1" role="presentation">
+  <div
+    class="modal"
+    (click)="$event.stopPropagation()"
+    (keydown)="$event.stopPropagation()"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Verify your email"
+    tabindex="-1"
+  >
+    <div class="modal__header">
+      <div>
+        <h3 class="modal__title">Verify your email</h3>
+        <p class="modal__subtitle">
+          {{ isRequesting() ? 'Sending code…' : 'Enter the 6-digit code we sent you.' }}
+        </p>
+      </div>
+      <button class="modal__close" (click)="closed.emit()" aria-label="Close">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <div class="modal__body">
+      <div class="otp">
+        @for (digit of otp(); track $index; let i = $index) {
+          <input
+            #digitInput
+            class="otp__digit"
+            type="text"
+            inputmode="numeric"
+            maxlength="1"
+            [value]="digit"
+            [disabled]="isRequesting() || isConfirming()"
+            (input)="handleDigitChange(i, $any($event.target))"
+            (keydown)="handleKeyDown(i, $event)"
+            (paste)="handlePaste($event)"
+            [attr.aria-label]="'Digit ' + (i + 1)"
+          />
+        }
+      </div>
+
+      @if (error()) {
+        <div class="modal__error">
+          <mat-icon>error_outline</mat-icon>
+          {{ error() }}
+        </div>
+      }
+
+      <button
+        mat-flat-button
+        class="modal__confirm"
+        (click)="handleConfirm()"
+        [disabled]="isRequesting() || isConfirming()"
+      >
+        {{ isConfirming() ? 'Verifying…' : 'Verify Email' }}
+      </button>
+
+      <button class="modal__resend" (click)="requestCode()" [disabled]="isRequesting() || resendCooldown() > 0">
+        {{ resendCooldown() > 0 ? 'Resend code in ' + resendCooldown() + 's' : 'Resend code' }}
+      </button>
+    </div>
+  </div>
+</div>

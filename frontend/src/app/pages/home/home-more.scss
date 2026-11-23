@@ -1,0 +1,597 @@
+@use '../../shared/browse/mixins' as m;
+
+// Home styles, part 5: editor's pick, why us, trending, styles & tech, newsletter.
+
+// ── Editor's pick ────────────────────────────────────────────────────────────
+.editors {
+  margin-top: 3rem;
+}
+
+.editors__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 1024px) {
+  .editors__grid {
+    grid-template-columns: 1.25fr 0.75fr;
+  }
+}
+
+.editors__hero {
+  position: relative;
+  min-height: 320px;
+  overflow: hidden;
+  border: 1px solid var(--neutral-200);
+  border-radius: var(--radius-2xl);
+}
+
+:host-context(.dark) .editors__hero {
+  border-color: color-mix(in oklab, var(--neutral-700) 60%, transparent);
+}
+
+.editors__img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.editors__shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to right,
+    color-mix(in oklab, #000 75%, transparent),
+    color-mix(in oklab, #000 45%, transparent),
+    transparent
+  );
+}
+
+.editors__body {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  max-width: 36rem;
+  height: 100%;
+  padding: 2rem;
+}
+
+@media (min-width: 768px) {
+  .editors__body {
+    padding: 2.5rem;
+  }
+}
+
+.editors__eyebrow {
+  margin-bottom: 0.5rem;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: color-mix(in oklab, #fff 60%, transparent);
+}
+
+.editors__title {
+  font-size: 1.5rem;
+  line-height: 1.25;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: #fff;
+}
+
+@media (min-width: 768px) {
+  .editors__title {
+    font-size: 2.25rem;
+  }
+}
+
+.editors__text {
+  margin-top: 0.75rem;
+  font-size: 0.875rem;
+  line-height: 1.625;
+  color: color-mix(in oklab, #fff 75%, transparent);
+}
+
+.editors__action {
+  margin-top: 1.25rem;
+}
+
+.editors__button {
+  @include m.solid-button(#fff, var(--neutral-900), var(--radius-md), 2.25rem, 0.875rem, 600);
+  width: fit-content;
+}
+
+.editors__services {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+.service {
+  padding: 1.25rem;
+  border: 1px solid var(--neutral-200);
+  border-radius: var(--radius-2xl);
+  background: var(--neutral-50);
+}
+
+:host-context(.dark) .service {
+  border-color: color-mix(in oklab, var(--neutral-700) 60%, transparent);
+  background: var(--neutral-900);
+}
+
+// ── Why us ───────────────────────────────────────────────────────────────────
+.why {
+  margin-top: 4rem;
+}
+
+.why__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  .why__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 768px) {
+  .why__grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.why__card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1.5rem;
+  border: 1px solid var(--neutral-100);
+  border-radius: var(--radius-2xl);
+  background: var(--neutral-50);
+  cursor: default;
+  transition: all 0.2s;
+}
+
+.why__card:hover {
+  border-color: var(--neutral-300);
+  background: #fff;
+  transform: translateY(-0.25rem);
+}
+
+:host-context(.dark) .why__card {
+  border-color: var(--neutral-800);
+  background: var(--neutral-900);
+}
+
+:host-context(.dark) .why__card:hover {
+  border-color: var(--neutral-600);
+  background: color-mix(in oklab, var(--neutral-800) 80%, transparent);
+}
+
+.why__text {
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  line-height: 1.625;
+  color: var(--neutral-500);
+}
+
+:host-context(.dark) .why__text {
+  color: var(--neutral-400);
+}
+
+// ── Trending now ─────────────────────────────────────────────────────────────
+.trending {
+  margin-top: 2.5rem;
+}
+
+.trending__panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  overflow: hidden;
+  padding: 2rem;
+  border: 1px solid var(--neutral-100);
+  border-radius: var(--radius-2xl);
+  background: var(--neutral-50);
+}
+
+:host-context(.dark) .trending__panel {
+  border-color: var(--neutral-800);
+  background: var(--neutral-900);
+}
+
+@media (min-width: 768px) {
+  .trending__panel {
+    flex-direction: row;
+    padding: 2.5rem;
+  }
+}
+
+.trending__fade {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 16rem;
+  height: 100%;
+  background: linear-gradient(to left, var(--neutral-100), transparent);
+  pointer-events: none;
+}
+
+:host-context(.dark) .trending__fade {
+  background: linear-gradient(to left, color-mix(in oklab, var(--neutral-800) 60%, transparent), transparent);
+}
+
+.trending__copy {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-width: 32rem;
+}
+
+.trending__tag {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.trending__tag-icon {
+  @include m.icon-size(1rem);
+  color: var(--neutral-500);
+}
+
+.trending__tag-text {
+  font-size: 0.75rem;
+  line-height: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--neutral-400);
+}
+
+:host-context(.dark) .trending__tag-icon {
+  color: var(--neutral-400);
+}
+
+:host-context(.dark) .trending__tag-text {
+  color: var(--neutral-500);
+}
+
+.trending__title {
+  font-size: 1.5rem;
+  line-height: 1.25;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: var(--neutral-900);
+}
+
+@media (min-width: 768px) {
+  .trending__title {
+    font-size: 1.875rem;
+  }
+}
+
+.trending__text {
+  font-size: 0.875rem;
+  line-height: 1.625;
+  color: var(--neutral-500);
+}
+
+:host-context(.dark) .trending__title {
+  color: var(--neutral-100);
+}
+
+:host-context(.dark) .trending__text {
+  color: var(--neutral-400);
+}
+
+.trending__button {
+  @include m.solid-button(var(--neutral-900), #fff, var(--radius-md), 2.25rem, 0.875rem, 600);
+  box-shadow: var(--shadow-sm);
+}
+
+:host-context(.dark) .trending__button {
+  @include m.solid-button(#fff, var(--neutral-900), var(--radius-md), 2.25rem, 0.875rem, 600);
+}
+
+.trending__emojis {
+  display: grid;
+  flex-shrink: 0;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.trending__emoji {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  border: 1px solid var(--neutral-200);
+  border-radius: var(--radius-xl);
+  background: #fff;
+  box-shadow: var(--shadow-sm);
+  font-size: 1.5rem;
+  line-height: 2rem;
+}
+
+:host-context(.dark) .trending__emoji {
+  border-color: var(--neutral-700);
+  background: var(--neutral-800);
+}
+
+// ── Trending styles & tech ───────────────────────────────────────────────────
+.styles {
+  margin-top: 3rem;
+}
+
+.styles__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+}
+
+@media (min-width: 768px) {
+  .styles__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.styles__photo {
+  overflow: hidden;
+  border: 1px solid var(--neutral-200);
+  border-radius: var(--radius-2xl);
+  background: #fff;
+}
+
+:host-context(.dark) .styles__photo {
+  border-color: color-mix(in oklab, var(--neutral-700) 60%, transparent);
+  background: var(--neutral-900);
+}
+
+.styles__img {
+  width: 100%;
+  height: 16rem;
+  object-fit: cover;
+}
+
+.styles__photo-body {
+  padding: 1.5rem;
+}
+
+.styles__photo-title {
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+  font-weight: 600;
+  letter-spacing: normal;
+  color: var(--neutral-900);
+}
+
+.styles__photo-text,
+.styles__promo-text {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.625;
+  color: var(--neutral-500);
+}
+
+:host-context(.dark) .styles__photo-title {
+  color: var(--neutral-100);
+}
+
+:host-context(.dark) .styles__photo-text,
+:host-context(.dark) .styles__promo-text {
+  color: var(--neutral-400);
+}
+
+.styles__promo {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 1.5rem;
+  border: 1px solid var(--neutral-200);
+  border-radius: var(--radius-2xl);
+  background: var(--neutral-50);
+}
+
+:host-context(.dark) .styles__promo {
+  border-color: color-mix(in oklab, var(--neutral-700) 60%, transparent);
+  background: var(--neutral-900);
+}
+
+@media (min-width: 768px) {
+  .styles__promo {
+    padding: 2rem;
+  }
+}
+
+.styles__promo-title {
+  font-size: 1.5rem;
+  line-height: 1.25;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: var(--neutral-900);
+}
+
+:host-context(.dark) .styles__promo-title {
+  color: var(--neutral-100);
+}
+
+.styles__promo-text {
+  max-width: 36rem;
+  margin-top: 0.75rem;
+}
+
+.styles__promo-action {
+  margin-top: 1.25rem;
+}
+
+.styles__button {
+  @include m.outline-button(var(--foreground), var(--neutral-200), var(--radius-md), 2.25rem, 0.875rem);
+  width: fit-content;
+}
+
+:host-context(.dark) .styles__button {
+  @include m.outline-button(var(--neutral-200), var(--neutral-700), var(--radius-md), 2.25rem, 0.875rem);
+}
+
+// ── Newsletter ───────────────────────────────────────────────────────────────
+.newsletter {
+  margin-top: 2.5rem;
+  margin-bottom: 3rem;
+}
+
+.newsletter__panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  overflow: hidden;
+  padding: 2rem;
+  border-radius: var(--radius-2xl);
+  background: var(--neutral-900);
+  text-align: center;
+}
+
+:host-context(.dark) .newsletter__panel {
+  border: 1px solid color-mix(in oklab, var(--neutral-700) 60%, transparent);
+  background: color-mix(in oklab, var(--neutral-800) 60%, transparent);
+}
+
+@media (min-width: 768px) {
+  .newsletter__panel {
+    padding: 3rem;
+  }
+}
+
+.newsletter__orb {
+  position: absolute;
+  width: 13rem;
+  height: 13rem;
+  border-radius: var(--radius-full);
+  background: color-mix(in oklab, #fff 5%, transparent);
+  filter: blur(64px);
+  pointer-events: none;
+}
+
+.newsletter__orb--start {
+  top: -2.5rem;
+  left: -2.5rem;
+}
+
+.newsletter__orb--end {
+  right: -2.5rem;
+  bottom: -2.5rem;
+}
+
+.newsletter__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: var(--radius-full);
+  background: color-mix(in oklab, #fff 10%, transparent);
+  color: #fff;
+}
+
+.newsletter__copy {
+  max-width: 28rem;
+}
+
+.newsletter__title {
+  font-size: 1.5rem;
+  line-height: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: #fff;
+}
+
+@media (min-width: 768px) {
+  .newsletter__title {
+    font-size: 1.875rem;
+    line-height: 2.25rem;
+  }
+}
+
+.newsletter__text {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.625;
+  color: color-mix(in oklab, #fff 50%, transparent);
+}
+
+.newsletter__form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+  max-width: 28rem;
+}
+
+@media (min-width: 640px) {
+  .newsletter__form {
+    flex-direction: row;
+  }
+}
+
+.newsletter__input {
+  flex: 1;
+  padding: 0.625rem 1rem;
+  border: 1px solid color-mix(in oklab, #fff 20%, transparent);
+  border-radius: var(--radius-xl);
+  outline: none;
+  background: color-mix(in oklab, #fff 10%, transparent);
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: #fff;
+  transition: border-color 0.15s;
+}
+
+.newsletter__input::placeholder {
+  color: color-mix(in oklab, #fff 30%, transparent);
+}
+
+.newsletter__input:focus {
+  border-color: color-mix(in oklab, #fff 50%, transparent);
+}
+
+.newsletter__button {
+  @include m.solid-button(#fff, var(--neutral-900), var(--radius-md), 2.25rem, 0.875rem, 700);
+  width: 100%;
+  padding-inline: 1.5rem;
+  white-space: nowrap;
+}
+
+@media (min-width: 640px) {
+  .newsletter__button {
+    width: auto;
+  }
+}
+
+.newsletter__legal {
+  font-size: 0.75rem;
+  line-height: 1rem;
+  color: color-mix(in oklab, #fff 25%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
+  }
+
+  .why__card {
+    transition: none;
+  }
+}

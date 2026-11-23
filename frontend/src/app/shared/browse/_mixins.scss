@@ -1,0 +1,41 @@
+// Sass-only helpers for the browse pages (no global CSS emitted from here).
+
+@mixin line-clamp($lines) {
+  display: -webkit-box;
+  -webkit-line-clamp: $lines;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+// Material flat (filled) button theming through its own CSS variables.
+@mixin solid-button($bg, $fg, $shape: var(--radius-lg), $height: 2.5rem, $size: 0.75rem, $weight: 500) {
+  --mat-button-filled-container-color: #{$bg};
+  --mat-button-filled-label-text-color: #{$fg};
+  --mat-button-filled-container-shape: #{$shape};
+  --mat-button-filled-container-height: #{$height};
+  --mat-button-filled-label-text-size: #{$size};
+  --mat-button-filled-label-text-weight: #{$weight};
+  --mat-button-filled-hover-state-layer-color: #{$fg};
+  --mat-button-filled-focus-state-layer-color: #{$fg};
+  --mat-button-filled-ripple-color: #{$fg};
+}
+
+// Material stroked (outlined) button theming.
+@mixin outline-button($color, $outline, $shape: var(--radius-lg), $height: 2.5rem, $size: 0.75rem, $weight: 500) {
+  --mat-button-outlined-label-text-color: #{$color};
+  --mat-button-outlined-outline-color: #{$outline};
+  --mat-button-outlined-container-shape: #{$shape};
+  --mat-button-outlined-container-height: #{$height};
+  --mat-button-outlined-label-text-size: #{$size};
+  --mat-button-outlined-label-text-weight: #{$weight};
+  --mat-button-outlined-hover-state-layer-color: #{$color};
+  --mat-button-outlined-focus-state-layer-color: #{$color};
+}
+
+// Icon sizing for <mat-icon> (width/height/font-size must all be set).
+@mixin icon-size($size) {
+  width: $size;
+  height: $size;
+  font-size: $size;
+  line-height: $size;
+}

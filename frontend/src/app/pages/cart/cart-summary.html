@@ -1,0 +1,61 @@
+<mat-card appearance="outlined" class="summary__card">
+  <div class="summary__head">
+    <h3 class="summary__title">Order Summary</h3>
+    <p class="summary__desc">Review your order before checkout</p>
+  </div>
+
+  <div class="summary__body">
+    <div class="summary__promo">
+      <input class="summary__promo-input" placeholder="Promo code" />
+      <button mat-stroked-button class="summary__promo-btn">Apply</button>
+    </div>
+
+    <div class="summary__rows">
+      <div class="summary__row">
+        <span>Subtotal</span>
+        <span class="summary__value">{{ formatPrice(subtotal()) }}</span>
+      </div>
+      <div class="summary__row">
+        <span>Delivery Fee</span>
+        <span class="summary__value summary__value--strong" [class.summary__value--free]="deliveryFee() === 0">{{
+          deliveryFee() === 0 ? 'Free' : formatPrice(deliveryFee())
+        }}</span>
+      </div>
+    </div>
+
+    <mat-divider class="summary__divider" />
+
+    <div class="summary__total">
+      <span class="summary__total-label">Total</span>
+      @for (t of [total()]; track t) {
+        <span class="summary__total-value">{{ formatPrice(t) }}</span>
+      }
+    </div>
+    <p class="summary__note">Choosing Cash on Delivery adds a small platform fee at checkout.</p>
+  </div>
+
+  <div class="summary__footer">
+    <button mat-flat-button class="summary__checkout" (click)="checkout.emit()">
+      <mat-icon>lock</mat-icon> Proceed to Checkout
+    </button>
+    <div class="summary__secure">
+      <mat-icon class="summary__secure-icon">verified_user</mat-icon>
+      Secure checkout · 30-day returns
+    </div>
+  </div>
+</mat-card>
+
+<div class="delivery">
+  <div class="delivery__icon-wrap">
+    <mat-icon class="delivery__icon">local_shipping</mat-icon>
+  </div>
+  <div class="delivery__text">
+    <span class="delivery__title">Free standard delivery</span>
+    <span class="delivery__desc">Available on all orders over ₹{{ freeDeliveryThreshold() }}</span>
+  </div>
+  @if (deliveryFee() === 0) {
+    <div class="delivery__applied">
+      <span class="delivery__applied-tag">Applied!</span>
+    </div>
+  }
+</div>

@@ -1,0 +1,128 @@
+@if (isLoading()) {
+  <div class="wl-loading">
+    <div class="wl-loading__inner">
+      <div class="wl-loading__title"></div>
+      <div class="wl-loading__grid">
+        @for (i of [1, 2, 3, 4]; track i) {
+          <div class="wl-loading__card"></div>
+        }
+      </div>
+    </div>
+  </div>
+} @else {
+  <div class="wl">
+    <!-- Toast -->
+    @if (notification().show) {
+      <div class="wl-toast">
+        <div
+          class="wl-toast__body"
+          [class.wl-toast__body--error]="notification().type === 'error'"
+          [class.wl-toast__body--success]="notification().type !== 'error'"
+        >
+          <mat-icon class="wl-toast__icon">{{ notification().type === 'error' ? 'error_outline' : 'check_circle' }}</mat-icon>
+          {{ notification().message }}
+        </div>
+      </div>
+    }
+
+    <main class="wl__main">
+      <!-- Header -->
+      <div class="wl-header">
+        <div class="wl-header__text">
+          <div class="wl-header__title-row">
+            <div class="wl-header__badge">
+              <mat-icon class="wl-header__badge-icon">favorite_border</mat-icon>
+            </div>
+            <h1 class="wl-header__title">My Wishlist</h1>
+          </div>
+          <p class="wl-header__count">
+            {{
+              products().length === 0
+                ? 'No saved items yet'
+                : products().length + ' saved ' + (products().length === 1 ? 'item' : 'items')
+            }}
+          </p>
+        </div>
+
+        <button mat-button type="button" (click)="browse()" class="wl-header__browse">
+          <mat-icon>arrow_back</mat-icon> Continue browsing
+        </button>
+      </div>
+
+      @if (products().length === 0) {
+        <!-- Empty state -->
+        <div class="wl-empty">
+          <div class="wl-empty__circle">
+            <mat-icon class="wl-empty__icon">favorite_border</mat-icon>
+          </div>
+          <h3 class="wl-empty__title">Your wishlist is empty</h3>
+          <p class="wl-empty__text">Tap the ♥ heart icons while browsing to save items you love here.</p>
+          <button mat-flat-button type="button" (click)="browse()" class="wl-empty__cta">
+            <mat-icon>auto_awesome</mat-icon> Explore Catalog
+          </button>
+        </div>
+      } @else {
+        <div class="wl-grid">
+          @for (product of products(); track product.id; let i = $index) {
+            <div class="wl-item" [class.wl-item--removing]="removingSku() === product.skuCode" [style.animation-delay.s]="i * 0.06">
+              <mat-card appearance="outlined" class="wl-card">
+                <!-- Image area -->
+                <div class="wl-card__image-area">
+                  @if (product.imageUrl && !brokenImages().has(product.skuCode)) {
+                    <img [src]="product.imageUrl" [alt]="product.name" class="wl-card__image" (error)="markBroken(product.skuCode)" />
+                  } @else {
+                    <div class="wl-card__no-image">
+                      <mat-icon class="wl-card__no-image-icon">image</mat-icon>
+                      <span class="wl-card__no-image-text">No Image</span>
+                    </div>
+                  }
+
+                  <!-- Remove button -->
+                  <div class="wl-card__remove">
+                    <button type="button" (click)="handleRemove(product.skuCode)" class="wl-card__remove-btn" aria-label="Remove from wishlist">
+                      <mat-icon class="wl-card__remove-icon">delete_outline</mat-icon>
+                    </button>
+                  </div>
+
+                  <!-- Saved pill -->
+                  <div class="wl-card__saved">
+                    <span class="wl-card__saved-pill">
+                      <mat-icon class="wl-card__saved-icon">favorite</mat-icon> Saved
+                    </span>
+                  </div>
+                </div>
+
+                <div class="wl-card__content">
+                  <span class="wl-card__category">{{ categoryName(product) }}</span>
+                  <a [routerLink]="['/product', product.id]" class="wl-card__link">
+                    <h3 class="wl-card__name">{{ product.name }}</h3>
+                    <span class="wl-card__price">{{ formatPrice(product.price) }}</span>
+                  </a>
+                </div>
+
+                <div class="wl-card__footer">
+                  <button
+                    mat-flat-button
+                    type="button"
+                    class="wl-card__add-btn"
+                    (click)="handleAddToCart($event, product.skuCode)"
+                    [disabled]="addingSku() === product.skuCode"
+                  >
+                    @if (addingSku() === product.skuCode) {
+                      <mat-icon class="wl-card__spin">autorenew</mat-icon> Moving…
+                    } @else {
+                      <mat-icon>shopping_cart</mat-icon> Add to Cart
+                    }
+                  </button>
+                  <a [routerLink]="['/product', product.id]" class="wl-card__view">
+                    View product <mat-icon class="wl-card__view-icon">arrow_forward</mat-icon>
+                  </a>
+                </div>
+              </mat-card>
+            </div>
+          }
+        </div>
+      }
+    </main>
+  </div>
+}

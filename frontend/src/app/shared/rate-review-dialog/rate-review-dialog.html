@@ -1,0 +1,77 @@
+<div class="rate-dialog">
+  <div class="rate-dialog__header">
+    <div class="rate-dialog__heading">
+      <span class="rate-dialog__title">Rate this product</span>
+      @if (data.productName) {
+        <span class="rate-dialog__product">{{ data.productName }}</span>
+      }
+    </div>
+    <button type="button" (click)="close()" class="rate-dialog__close" aria-label="Close">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <div class="rate-dialog__body">
+    @if (banner().show) {
+      <div
+        class="rate-dialog__banner"
+        [class.rate-dialog__banner--error]="banner().type === 'error'"
+        [class.rate-dialog__banner--success]="banner().type !== 'error'"
+      >
+        <mat-icon class="rate-dialog__banner-icon">{{ banner().type === 'error' ? 'error_outline' : 'check_circle' }}</mat-icon>
+        {{ banner().message }}
+      </div>
+    }
+
+    <div class="rate-dialog__rating">
+      <div class="rate-dialog__stars">
+        @for (n of stars; track n) {
+          <button
+            type="button"
+            class="rate-dialog__star"
+            [class.rate-dialog__star--active]="n <= display()"
+            [attr.aria-label]="'Rate ' + n + ' star' + (n > 1 ? 's' : '')"
+            (click)="rating.set(n)"
+            (mouseenter)="hovered.set(n)"
+            (mouseleave)="hovered.set(0)"
+          >
+            <mat-icon class="rate-dialog__star-icon">{{ n <= display() ? 'star' : 'star_border' }}</mat-icon>
+          </button>
+        }
+      </div>
+      <span class="rate-dialog__rating-label">
+        {{ rating() === 0 ? 'Tap a star to rate' : labels[rating()] }}
+      </span>
+    </div>
+
+    <div class="rate-dialog__field">
+      <label for="review-comment" class="rate-dialog__label">Review (optional)</label>
+      <textarea
+        id="review-comment"
+        [(ngModel)]="comment"
+        maxlength="1000"
+        rows="4"
+        placeholder="What did you like or dislike about this product?"
+        class="rate-dialog__textarea"
+      ></textarea>
+      <span class="rate-dialog__counter">{{ comment.length }}/1000</span>
+    </div>
+  </div>
+
+  <div class="rate-dialog__footer">
+    <button mat-stroked-button type="button" (click)="close()" class="rate-dialog__cancel">Cancel</button>
+    <button mat-flat-button type="button" (click)="submit()" [disabled]="isSubmitting()" class="rate-dialog__submit">
+      @if (isSubmitting()) {
+        <span class="rate-dialog__submit-label">
+          <svg class="rate-dialog__spinner" viewBox="0 0 24 24" fill="none">
+            <circle class="rate-dialog__spinner-track" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+            <path class="rate-dialog__spinner-head" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+          </svg>
+          Submitting...
+        </span>
+      } @else {
+        Submit review
+      }
+    </button>
+  </div>
+</div>

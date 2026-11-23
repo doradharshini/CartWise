@@ -1,0 +1,17 @@
+# Holds secrets (JWT key, DB passwords) - keep out of version control
+backend/cartwise-config-repo/
+
+# Uploaded product images
+backend/uploaded-images/*
+!backend/uploaded-images/.gitkeep
+
+node_modules/
+
+# Build output / caches
+target/
+dist/
+.angular/
+.idea/
+*.log
+.env
+.env.*

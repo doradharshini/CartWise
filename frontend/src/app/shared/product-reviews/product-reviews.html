@@ -1,0 +1,91 @@
+<div class="reviews">
+  <mat-card appearance="outlined" class="reviews__card">
+    <h3 class="reviews__heading">
+      <mat-icon class="reviews__heading-icon">chat_bubble_outline</mat-icon>
+      Customer Reviews
+    </h3>
+
+    <div class="reviews__body">
+      @if (isLoading()) {
+        <div class="reviews__skeleton">
+          <div class="reviews__skeleton-block reviews__skeleton-block--short"></div>
+          <div class="reviews__skeleton-block reviews__skeleton-block--tall"></div>
+        </div>
+      } @else {
+        <!-- Summary -->
+        <div class="reviews__summary">
+          <div class="reviews__average">
+            <span class="reviews__average-value">
+              {{ reviews().length ? averageRating().toFixed(1) : '—' }}
+            </span>
+            <div class="reviews__stars">
+              @for (n of stars; track n) {
+                <mat-icon class="reviews__star reviews__star--md" [class.reviews__star--filled]="n <= roundedAvg()">star</mat-icon>
+              }
+            </div>
+            <span class="reviews__count">
+              {{ reviews().length }} {{ reviews().length === 1 ? 'review' : 'reviews' }}
+            </span>
+          </div>
+
+          @if (reviews().length > 0) {
+            <div class="reviews__distribution">
+              @for (d of distribution(); track d.star) {
+                <div class="reviews__bar-row">
+                  <span class="reviews__bar-star">{{ d.star }}</span>
+                  <mat-icon class="reviews__bar-icon">star</mat-icon>
+                  <div class="reviews__bar-track">
+                    <div class="reviews__bar-fill" [style.width.%]="d.pct"></div>
+                  </div>
+                  <span class="reviews__bar-count">{{ d.count }}</span>
+                </div>
+              }
+            </div>
+          }
+        </div>
+
+        <mat-divider />
+
+        <!-- Review list -->
+        @if (reviews().length === 0) {
+          <div class="reviews__empty">
+            <mat-icon class="reviews__empty-icon">chat_bubble_outline</mat-icon>
+            <span class="reviews__empty-title">No reviews yet</span>
+            <span class="reviews__empty-text">
+              Be the first verified buyer to share your experience with this product.
+            </span>
+          </div>
+        } @else {
+          <div class="reviews__list">
+            @for (review of reviews(); track review.id) {
+              <div class="review">
+                <div class="review__avatar">
+                  <mat-icon class="review__avatar-icon">person_outline</mat-icon>
+                </div>
+                <div class="review__main">
+                  <div class="review__who">
+                    <span class="review__name">Verified Buyer</span>
+                    <span class="review__badge">
+                      <mat-icon class="review__badge-icon">verified_user</mat-icon> Verified Purchase
+                    </span>
+                  </div>
+                  <div class="review__meta">
+                    <div class="reviews__stars">
+                      @for (n of stars; track n) {
+                        <mat-icon class="reviews__star reviews__star--sm" [class.reviews__star--filled]="n <= review.rating">star</mat-icon>
+                      }
+                    </div>
+                    <span class="review__time">{{ relativeTime(review.createdAt) }}</span>
+                  </div>
+                  @if (review.comment) {
+                    <p class="review__comment">{{ review.comment }}</p>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        }
+      }
+    </div>
+  </mat-card>
+</div>

@@ -1,0 +1,213 @@
+:host {
+  --surface: var(--white);
+  --text: var(--neutral-900);
+  --text-muted: var(--neutral-500);
+  --line: var(--neutral-200);
+  --line-soft: var(--neutral-100);
+  --field-bg: var(--neutral-50);
+  --field-border: var(--neutral-200);
+  --field-focus: var(--neutral-400);
+  --field-focus-ring: var(--neutral-200);
+  --btn-bg: var(--neutral-900);
+  --btn-fg: var(--white);
+  --hover-bg: var(--neutral-100);
+}
+
+:host-context(.dark) {
+  --surface: var(--neutral-900);
+  --text: var(--neutral-100);
+  --text-muted: var(--neutral-400);
+  --line: color-mix(in oklab, var(--neutral-700) 60%, transparent);
+  --line-soft: var(--neutral-800);
+  --field-bg: var(--neutral-800);
+  --field-border: var(--neutral-700);
+  --field-focus: var(--neutral-500);
+  --field-focus-ring: var(--neutral-700);
+  --btn-bg: var(--white);
+  --btn-fg: var(--neutral-900);
+  --hover-bg: var(--neutral-800);
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes pop-in {
+  from { opacity: 0; transform: translateY(8px) scale(0.96); }
+  to { opacity: 1; transform: none; }
+}
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: color-mix(in oklab, var(--black) 60%, transparent);
+  backdrop-filter: blur(4px);
+  animation: fade-in 0.2s ease;
+}
+
+.modal {
+  width: 100%;
+  max-width: 24rem;
+  overflow: hidden;
+  border-radius: var(--radius-2xl);
+  border: 1px solid var(--line);
+  background: var(--surface);
+  box-shadow: var(--shadow-xl);
+  animation: pop-in 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--line-soft);
+  }
+
+  &__title {
+    font-size: 1rem;
+    line-height: 1.5rem;
+    font-weight: 700;
+    letter-spacing: normal;
+    color: var(--text);
+  }
+
+  &__subtitle {
+    margin-top: 0.125rem;
+    font-size: 0.75rem;
+    line-height: 1rem;
+    color: var(--text-muted);
+  }
+
+  &__close {
+    width: 2rem;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-full);
+    background: none;
+    color: var(--text-muted);
+    transition: background-color 0.15s;
+
+    &:hover {
+      background: var(--hover-bg);
+    }
+
+    mat-icon {
+      font-size: 1rem;
+      width: 1rem;
+      height: 1rem;
+    }
+  }
+
+  &__body {
+    padding: 1.5rem;
+  }
+
+  &__error {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    padding: 0.75rem;
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--red-200);
+    background: var(--red-50);
+    color: var(--red-600);
+    font-size: 0.75rem;
+    line-height: 1rem;
+    font-weight: 500;
+
+    mat-icon {
+      flex-shrink: 0;
+      font-size: 0.875rem;
+      width: 0.875rem;
+      height: 0.875rem;
+    }
+  }
+
+  &__confirm {
+    --mat-button-filled-container-color: var(--btn-bg);
+    --mat-button-filled-label-text-color: var(--btn-fg);
+    --mat-button-filled-container-shape: var(--radius-xl);
+    --mat-button-filled-container-height: 2.75rem;
+    width: 100%;
+    font-weight: 700;
+  }
+
+  &__resend {
+    display: block;
+    width: 100%;
+    margin-top: 1rem;
+    padding: 0;
+    border: 0;
+    background: none;
+    text-align: center;
+    font-size: 0.75rem;
+    line-height: 1rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    transition: color 0.15s;
+
+    &:hover:not(:disabled) {
+      color: var(--text);
+    }
+
+    &:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+  }
+}
+
+:host-context(.dark) .modal__error {
+  background: color-mix(in oklab, var(--red-950) 50%, transparent);
+  border-color: var(--red-900);
+  color: var(--red-400);
+}
+
+.otp {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+
+  &__digit {
+    width: 2.75rem;
+    height: 2.75rem;
+    text-align: center;
+    font-size: 1.125rem;
+    line-height: 1.75rem;
+    font-weight: 700;
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--field-border);
+    background: var(--field-bg);
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+
+    &:focus {
+      border-color: var(--field-focus);
+      box-shadow: 0 0 0 1px var(--field-focus-ring);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .backdrop,
+  .modal {
+    animation: none;
+  }
+}

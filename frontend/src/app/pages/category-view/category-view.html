@@ -1,0 +1,149 @@
+@if (isLoading() && products().length === 0) {
+  <div class="category__container">
+    <div class="category__loading-title"></div>
+    <div class="category__grid">
+      @for (i of skeletons; track i) {
+        <div class="skeleton" appReveal [revealDelay]="i * 60">
+          <div class="skeleton__image"></div>
+          <div class="skeleton__line"></div>
+          <div class="skeleton__line skeleton__line--short"></div>
+        </div>
+      }
+    </div>
+  </div>
+} @else if (error()) {
+  <div class="category__error" appReveal [revealY]="20">
+    <mat-icon class="category__error-icon">error_outline</mat-icon>
+    <h2 class="category__error-title">Oops!</h2>
+    <p class="category__error-text">{{ error() }}</p>
+    <button mat-stroked-button class="category__retry" (click)="reload()">Try Again</button>
+  </div>
+} @else {
+  <div class="category">
+    <app-toast-banner [notification]="notification()" />
+
+    <main class="category__container category__container--main">
+      <!-- Back Button -->
+      <button type="button" class="category__back" (click)="goHome()">
+        <mat-icon class="category__back-icon">arrow_back</mat-icon> Back to Home
+      </button>
+
+      <!-- Category Header -->
+      <div class="category__header">
+        <div appReveal [revealY]="24">
+          <span class="category__eyebrow">
+            <mat-icon class="category__eyebrow-icon">sell</mat-icon> Category
+          </span>
+        </div>
+
+        <div class="category__heading" appReveal [revealDelay]="60">
+          <h1 class="category__title">{{ categoryName() }}</h1>
+
+          <!-- Sorting & View Toggle Toolbar -->
+          <div class="category__toolbar">
+            <app-sort-menu [(value)]="sort" [bold]="true" />
+
+            <div class="view-toggle">
+              @for (v of [{ icon: 'grid_view', val: 'grid' }, { icon: 'view_list', val: 'list' }]; track v.val) {
+                <button
+                  type="button"
+                  class="view-toggle__button"
+                  [class.view-toggle__button--active]="view() === v.val"
+                  [attr.aria-label]="v.val + ' view'"
+                  (click)="view.set($any(v.val))"
+                >
+                  <mat-icon class="view-toggle__icon">{{ v.icon }}</mat-icon>
+                </button>
+              }
+            </div>
+          </div>
+        </div>
+
+        <div appReveal [revealDelay]="120">
+          <p class="category__count">
+            {{ products().length }} of {{ totalElements() }} products
+            @if (totalPages() > 1) {
+              <span class="category__count-page">· Page {{ currentPage() + 1 }} of {{ totalPages() }}</span>
+            }
+          </p>
+        </div>
+
+        <div class="category__divider" appReveal [revealDelay]="180"></div>
+      </div>
+
+      <!-- Empty State -->
+      @if (products().length === 0) {
+        <div class="empty" appReveal [revealY]="20" [revealDuration]="400">
+          <mat-icon class="empty__icon">production_quantity_limits</mat-icon>
+          <h2 class="empty__title">No items found</h2>
+          <p class="empty__text">We don't have any products in this category yet.</p>
+        </div>
+      } @else {
+        <!-- Product Grid/List (re-keyed so the entrance animation replays on view/page/sort change) -->
+        @for (key of [view() + '-page-' + currentPage() + '-' + sort()]; track key) {
+          <div
+            class="results"
+            [class.results--grid]="view() === 'grid'"
+            [class.results--list]="view() === 'list'"
+            appReveal
+            [revealY]="16"
+            [revealDuration]="350"
+          >
+            @for (product of sortedProducts(); track product.id; let i = $index) {
+              <app-browse-product-card
+                [product]="product"
+                [view]="view()"
+                [index]="i"
+                [staggerMod]="12"
+                [adding]="addingSku() === product.skuCode"
+                [saved]="wishlist.isSaved(product.skuCode)"
+                (addToCart)="handleAddToCart(product.skuCode)"
+                (wishlist)="handleWishlist(product.skuCode)"
+              />
+            }
+          </div>
+        }
+
+        <!-- Pagination -->
+        @if (totalPages() > 1) {
+          <nav class="pagination" aria-label="Pagination" appReveal [revealY]="16" [revealDelay]="100">
+            <button
+              mat-stroked-button
+              class="pagination__step"
+              (click)="handlePageChange(currentPage() > 0 ? currentPage() - 1 : 0)"
+              [disabled]="currentPage() === 0"
+            >
+              <mat-icon class="pagination__step-icon">chevron_left</mat-icon> Prev
+            </button>
+
+            <div class="pagination__pages">
+              @for (page of pages(); track $index) {
+                @if (page === '...') {
+                  <span class="pagination__ellipsis">…</span>
+                } @else {
+                  <button
+                    type="button"
+                    class="pagination__page"
+                    [class.pagination__page--active]="currentPage() === page"
+                    (click)="handlePageChange($any(page))"
+                  >
+                    {{ $any(page) + 1 }}
+                  </button>
+                }
+              }
+            </div>
+
+            <button
+              mat-stroked-button
+              class="pagination__step"
+              (click)="handlePageChange(currentPage() < totalPages() - 1 ? currentPage() + 1 : totalPages() - 1)"
+              [disabled]="currentPage() >= totalPages() - 1"
+            >
+              Next <mat-icon iconPositionEnd class="pagination__step-icon">chevron_right</mat-icon>
+            </button>
+          </nav>
+        }
+      }
+    </main>
+  </div>
+}

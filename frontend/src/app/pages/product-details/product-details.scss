@@ -1,0 +1,674 @@
+// Local color roles. Dark mode only swaps these (see the bottom of the file).
+:host {
+  display: block;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --c-page: #fff;
+  --c-strong: var(--neutral-900);
+  --c-text: var(--neutral-600);
+  --c-muted: var(--neutral-500);
+  --c-faint: var(--neutral-400);
+  --c-dim: var(--neutral-300);
+  --c-surface: var(--neutral-50);
+  --c-chip: var(--neutral-100);
+  --c-line: var(--neutral-200);
+  --c-line-soft: var(--neutral-100);
+  --c-raised: #fff;
+  --c-btn-bg: var(--neutral-900);
+  --c-btn-fg: #fff;
+  --c-toast: var(--neutral-900);
+  --c-ok-fg: var(--green-600);
+  --c-ok-bg: var(--green-50);
+  --c-ok-line: var(--green-100);
+}
+
+
+@mixin icon($size) {
+  width: $size;
+  height: $size;
+  font-size: $size;
+}
+
+@mixin clear-button {
+  padding: 0;
+  border: 0;
+  background: none;
+}
+
+// ── Loading skeleton ──
+.pd-loading {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 100vh;
+  max-width: var(--content-max);
+  margin-inline: auto;
+  padding: 2.5rem 1rem;
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+
+  &__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+
+  &__bone {
+    background: var(--c-chip);
+    border-radius: 0.25rem;
+
+    &--back { width: 8rem; height: 1rem; margin-bottom: 2.5rem; }
+    &--image { aspect-ratio: 1; border: 1px solid var(--c-line); border-radius: var(--radius-2xl); }
+    &--title { width: 60%; height: 2.25rem; }
+    &--block { height: 7rem; }
+    &--button { flex: 1; height: 3rem; border-radius: var(--radius-xl); }
+  }
+
+  &__info {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    padding-top: 1rem;
+  }
+
+  &__actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: auto;
+    padding-top: 1.5rem;
+  }
+}
+
+// ── Error state ──
+.pd-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  min-height: 100vh;
+  max-width: 1700px;
+  margin-inline: auto;
+  padding: 5rem 2rem;
+  text-align: center;
+  animation: fadeUp 0.45s var(--ease) both;
+
+  &__icon { @include icon(3rem); margin-bottom: 1rem; color: var(--red-500); }
+  &__title { margin-bottom: 0.5rem; font-size: 1.5rem; line-height: 2rem; font-weight: 700; color: var(--c-strong); }
+  &__message { margin-bottom: 1.5rem; color: var(--c-muted); }
+}
+
+// ── Page shell ──
+.pd {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  color: var(--c-strong);
+  background: var(--c-page);
+
+  &__main {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 1700px;
+    margin-inline: auto;
+    padding: 2.5rem 1rem;
+  }
+
+  &__back {
+    @include clear-button;
+    display: flex;
+    align-items: center;
+    width: fit-content;
+    margin-bottom: 2.5rem;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    font-weight: 500;
+    color: var(--c-muted);
+    transition: color 0.15s, transform 0.15s;
+    animation: slideBack 0.35s ease both;
+
+    &:hover { color: var(--c-strong); transform: translateX(-3px); }
+  }
+
+  &__back-icon { @include icon(1rem); margin-right: 0.375rem; }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+
+  &__reviews {
+    max-width: 48rem;
+    margin-top: 4rem;
+    animation: fadeUp 0.5s var(--ease) 0.3s both;
+  }
+}
+
+// ── Toast ──
+.pd-toast {
+  position: fixed;
+  right: 1.5rem;
+  bottom: 1.5rem;
+  z-index: 100;
+  animation: toastIn 0.25s ease both;
+
+  &__body {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.875rem 1.25rem;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    font-weight: 600;
+    color: #fff;
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-xl);
+
+    &--error { background: var(--red-600); }
+    &--success { background: var(--c-toast); }
+  }
+
+  &__icon { @include icon(1rem); }
+}
+
+// ── Zoom overlay ──
+.pd-zoom {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  background: rgb(0 0 0 / 0.8);
+  cursor: zoom-out;
+  animation: fadeIn 0.2s ease both;
+
+  &__img {
+    max-width: 90vw;
+    max-height: 90vh;
+    object-fit: contain;
+    border-radius: var(--radius-2xl);
+    animation: zoomIn 0.25s var(--ease) both;
+  }
+
+  &__nav {
+    @include clear-button;
+    position: absolute;
+    top: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: var(--radius-full);
+    color: #fff;
+    background: rgb(255 255 255 / 0.1);
+    transform: translateY(-50%);
+    transition: background-color 0.15s;
+
+    &:hover { background: rgb(255 255 255 / 0.2); }
+    &--prev { left: 1.5rem; }
+    &--next { right: 1.5rem; }
+  }
+
+  &__counter {
+    position: absolute;
+    bottom: 1.5rem;
+    left: 50%;
+    font-size: 0.75rem;
+    line-height: 1rem;
+    font-weight: 600;
+    color: rgb(255 255 255 / 0.7);
+    transform: translateX(-50%);
+  }
+}
+
+// ── Gallery ──
+.pd-gallery {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  animation: slideLeft 0.55s var(--ease) both;
+
+  &__stage {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 1;
+    padding: 2rem;
+    overflow: hidden;
+    user-select: none;
+    background: var(--c-surface);
+    border: 1px solid var(--c-line);
+    border-radius: var(--radius-2xl);
+
+    &--zoomable { cursor: zoom-in; }
+  }
+
+  &__image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    cursor: grab;
+    touch-action: pan-y;
+    transition: transform 0.5s;
+    animation: fadeIn 0.25s ease both;
+
+    &:active { cursor: grabbing; }
+  }
+
+  &__stage:hover &__image { transform: scale(1.05); }
+
+  &__placeholder {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--c-faint);
+    background: color-mix(in oklab, var(--c-chip) 50%, transparent);
+  }
+
+  &__placeholder-icon { @include icon(4rem); margin-bottom: 1rem; opacity: 0.4; }
+  &__placeholder-text { font-size: 0.875rem; line-height: 1.25rem; font-weight: 500; }
+
+  &__arrow {
+    position: absolute;
+    top: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    padding: 0;
+    color: var(--c-text);
+    background: color-mix(in oklab, var(--c-raised) 90%, transparent);
+    border: 1px solid var(--c-line-soft);
+    border-radius: var(--radius-full);
+    box-shadow: var(--shadow-sm);
+    opacity: 0;
+    transform: translateY(-50%);
+    transition: opacity 0.15s;
+
+    &--prev { left: 0.75rem; }
+    &--next { right: 0.75rem; }
+  }
+
+  &__stage:hover &__arrow,
+  &__stage:hover &__zoom-hint { opacity: 1; }
+
+  &__arrow-icon { @include icon(1rem); }
+
+  &__dots {
+    position: absolute;
+    bottom: 0.75rem;
+    left: 50%;
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    transform: translateX(-50%);
+  }
+
+  &__dot {
+    @include clear-button;
+    width: 0.375rem;
+    height: 0.375rem;
+    background: color-mix(in oklab, var(--c-strong) 30%, transparent);
+    border-radius: var(--radius-full);
+    transition: all 0.15s;
+
+    &--active { width: 1.25rem; background: var(--c-strong); }
+  }
+
+  &__zoom-hint {
+    position: absolute;
+    top: 0.75rem;
+    right: 3.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.375rem 0.625rem;
+    font-size: 10px;
+    line-height: 1rem;
+    font-weight: 600;
+    color: #fff;
+    background: rgb(0 0 0 / 0.6);
+    border-radius: var(--radius-full);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s;
+  }
+
+  &__zoom-hint-icon { @include icon(0.75rem); }
+
+  &__wishlist {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+
+    &--bounce { animation: bounce 0.4s ease; }
+  }
+
+  &__wishlist-btn {
+    --mat-fab-small-container-color: var(--c-raised);
+    --mat-fab-small-container-shape: 9999px;
+    --mat-fab-small-foreground-color: var(--c-text);
+    width: 2.5rem;
+    height: 2.5rem;
+    border: 1px solid var(--c-line-soft);
+    box-shadow: var(--shadow-sm);
+  }
+
+  &__heart {
+    color: var(--c-text);
+    transition: color 0.15s;
+
+    &--saved { color: var(--red-500); }
+  }
+
+  &__thumbs {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    padding-bottom: 0.25rem;
+    overflow-x: auto;
+  }
+
+  &__thumb {
+    @include clear-button;
+    position: relative;
+    flex-shrink: 0;
+    width: 4rem;
+    height: 4rem;
+    overflow: hidden;
+    border: 2px solid var(--c-line);
+    border-radius: var(--radius-xl);
+    opacity: 0.7;
+    transition: all 0.15s;
+
+    &:hover { opacity: 1; }
+    &--active { border-color: var(--c-strong); opacity: 1; }
+  }
+
+  &__thumb-img { width: 100%; height: 100%; object-fit: cover; background: var(--c-surface); }
+}
+
+// ── Trust row ──
+.pd-trust {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+  animation: fadeUp 0.4s ease 0.3s both;
+
+  &__item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.625rem 0.75rem;
+    background: var(--c-surface);
+    border: 1px solid var(--c-line-soft);
+    border-radius: var(--radius-xl);
+  }
+
+  &__icon { @include icon(0.875rem); color: var(--c-faint); }
+  &__label { font-size: 0.75rem; line-height: 1.25; font-weight: 500; color: var(--c-text); }
+}
+
+// ── Info panel ──
+.pd-info {
+  display: flex;
+  flex-direction: column;
+
+  // Staggered entrance (replaces framer-motion staggerChildren)
+  &__row { animation: fadeUp 0.45s var(--ease) both; animation-delay: calc(var(--i, 0) * 0.08s); }
+
+  &__row--meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  &__category {
+    padding: 0.125rem 0.625rem;
+    font-size: 10px;
+    line-height: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--c-text);
+    background: var(--c-chip);
+    border-radius: var(--radius-full);
+  }
+
+  &__dot { font-size: 0.75rem; line-height: 1rem; color: var(--c-dim); }
+
+  &__sku {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.75rem;
+    line-height: 1rem;
+    color: var(--c-faint);
+  }
+
+  &__name {
+    margin-bottom: 1rem;
+    font-size: 1.875rem;
+    line-height: 1.25;
+    font-weight: 900;
+    letter-spacing: -0.025em;
+    color: var(--c-strong);
+  }
+
+  &__seller {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.25rem;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    color: var(--c-muted);
+  }
+
+  &__seller-icon { @include icon(1rem); margin-right: 0.5rem; color: var(--c-faint); }
+
+  &__seller-name {
+    margin-left: 0.25rem;
+    font-weight: 600;
+    color: var(--c-strong);
+    text-decoration: underline;
+    text-decoration-color: var(--c-line);
+    text-underline-offset: 4px;
+  }
+
+  &__price-row { margin-bottom: 1.5rem; }
+
+  &__price {
+    font-size: 2.25rem;
+    line-height: 2.5rem;
+    font-weight: 900;
+    letter-spacing: -0.025em;
+    color: var(--c-strong);
+  }
+
+  &__stock {
+    margin-left: 0.75rem;
+    padding: 0.25rem 0.625rem;
+    font-size: 0.75rem;
+    line-height: 1rem;
+    font-weight: 600;
+    color: var(--c-ok-fg);
+    background: var(--c-ok-bg);
+    border: 1px solid var(--c-ok-line);
+    border-radius: var(--radius-full);
+  }
+
+  &__description {
+    margin-bottom: 1.5rem;
+    padding-top: 1.25rem;
+    font-size: 0.875rem;
+    line-height: 1.625;
+    color: var(--c-text);
+    border-top: 1px solid var(--c-line-soft);
+  }
+
+  &__qty-row { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; }
+  &__qty-label { font-size: 0.875rem; line-height: 1.25rem; font-weight: 600; color: var(--c-text); }
+
+  &__ctas {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--c-line-soft);
+  }
+
+  &__cta {
+    flex: 1;
+    transition: transform 0.15s;
+
+    &:hover { transform: scale(1.01); }
+    &:active { transform: scale(0.97); }
+  }
+
+  &__cart-btn,
+  &__buy-btn {
+    --mat-button-outlined-container-height: 3rem;
+    --mat-button-filled-container-height: 3rem;
+    width: 100%;
+    font-size: 0.875rem;
+    font-weight: 700;
+  }
+
+  &__buy-btn {
+    --mat-button-filled-container-color: var(--c-btn-bg);
+    --mat-button-filled-label-text-color: var(--c-btn-fg);
+    box-shadow: var(--shadow-sm);
+  }
+
+  &__wishlist-link {
+    @include clear-button;
+    display: flex;
+    align-items: center;
+    align-self: center;
+    gap: 0.5rem;
+    width: fit-content;
+    margin-top: 1rem;
+    font-size: 0.75rem;
+    line-height: 1rem;
+    font-weight: 600;
+    color: var(--c-faint);
+    transition: color 0.15s;
+
+    &:hover { color: var(--red-500); }
+  }
+
+  &__wishlist-icon {
+    @include icon(0.875rem);
+    transition: color 0.15s;
+
+    &--saved { color: var(--red-500); }
+  }
+}
+
+// ── Quantity stepper ──
+.pd-qty {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem;
+  background: var(--c-surface);
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-xl);
+
+  &__btn {
+    @include clear-button;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    color: var(--c-text);
+    border-radius: var(--radius-lg);
+    transition: all 0.15s;
+
+    &:hover:not(:disabled) { background: var(--c-raised); box-shadow: var(--shadow-sm); }
+    &:active:not(:disabled) { transform: scale(0.88); }
+    &:disabled { opacity: 0.3; cursor: not-allowed; }
+  }
+
+  &__icon { @include icon(0.875rem); }
+
+  &__value {
+    width: 2.5rem;
+    text-align: center;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--c-strong);
+    animation: qtyIn 0.15s ease both;
+  }
+}
+
+// ── Breakpoints ──
+@media (min-width: 640px) {
+  .pd-info__ctas { flex-direction: row; }
+  .pd-info__wishlist-link { align-self: flex-start; }
+}
+
+@media (min-width: 768px) {
+  .pd-loading { padding-inline: 2rem; }
+  .pd__main { padding-inline: 2rem; }
+  .pd-loading__grid,
+  .pd__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .pd-info__name { font-size: 2.25rem; line-height: 2.5rem; }
+}
+
+@media (min-width: 1024px) {
+  .pd-loading__grid,
+  .pd__grid { gap: 5rem; }
+}
+
+// ── Dark mode: swap the color roles ──
+:host-context(.dark) {
+  --c-page: var(--neutral-950);
+  --c-strong: var(--neutral-100);
+  --c-text: var(--neutral-400);
+  --c-muted: var(--neutral-400);
+  --c-faint: var(--neutral-500);
+  --c-dim: var(--neutral-600);
+  --c-surface: var(--neutral-900);
+  --c-chip: var(--neutral-800);
+  --c-line: var(--neutral-700);
+  --c-line-soft: var(--neutral-800);
+  --c-raised: var(--neutral-800);
+  --c-btn-bg: #fff;
+  --c-btn-fg: var(--neutral-900);
+  --c-toast: var(--neutral-700);
+  --c-ok-fg: var(--green-400);
+  --c-ok-bg: color-mix(in oklab, var(--green-950) 50%, transparent);
+  --c-ok-line: var(--green-900);
+
+  .pd-info__wishlist-link:hover { color: var(--red-400); }
+}
+
+// ── Keyframes ──
+@keyframes pulse { 50% { opacity: 0.5; } }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideLeft { from { opacity: 0; transform: translateX(-32px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes slideBack { from { opacity: 0; transform: translateX(-12px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes toastIn { from { opacity: 0; transform: translateY(20px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes zoomIn { from { opacity: 0; transform: scale(0.88); } to { opacity: 1; transform: scale(1); } }
+@keyframes qtyIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes bounce { 0%, 100% { transform: scale(1); } 25% { transform: scale(1.3); } 50% { transform: scale(0.9); } 75% { transform: scale(1.1); } }
+
+// Declared last so it wins over the equal-specificity animation rules above.
+@media (prefers-reduced-motion: reduce) {
+  :host *,
+  :host {
+    animation: none;
+  }
+}

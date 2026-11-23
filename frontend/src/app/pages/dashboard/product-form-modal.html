@@ -1,0 +1,129 @@
+<div class="backdrop backdrop--scroll anim-fade">
+  <div class="modal modal--wide anim-pop">
+    <div class="modal__header">
+      <div>
+        <h3 class="modal__title">{{ mode() === 'add' ? 'Create New Product' : 'Edit Product' }}</h3>
+        <p class="modal__subtitle">
+          {{ mode() === 'add' ? 'Add a new item to your catalog.' : "Update this product's details." }}
+        </p>
+      </div>
+      <button class="modal__close" (click)="closed.emit()" aria-label="Close">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <form class="modal__form" (ngSubmit)="submitted.emit()">
+      <div class="fields">
+        <div class="fields__full">
+          <label for="pf-name" class="label">Product Name</label>
+          <input id="pf-name" name="name" class="input" required [(ngModel)]="form.name" placeholder="e.g. Sony PlayStation 5" />
+        </div>
+
+        <div class="fields__full">
+          <label for="pf-desc" class="label">Description</label>
+          <input id="pf-desc" name="description" class="input" required [(ngModel)]="form.description" placeholder="Brief product description" />
+        </div>
+
+        <div>
+          <label for="pf-sku" class="label">SKU Code</label>
+          <input
+            id="pf-sku"
+            name="skuCode"
+            class="input input--mono"
+            required
+            [disabled]="mode() === 'edit'"
+            [(ngModel)]="form.skuCode"
+            placeholder="e.g. SONY-PS5-01"
+          />
+        </div>
+
+        <div>
+          <label for="pf-price" class="label">Price (₹)</label>
+          <input
+            id="pf-price"
+            name="price"
+            type="number"
+            step="0.01"
+            min="0"
+            class="input input--number"
+            required
+            [(ngModel)]="form.price"
+            placeholder="49990"
+          />
+        </div>
+
+        <div class="fields__category">
+          <label for="pf-cat" class="label">Category</label>
+          <select id="pf-cat" name="categoryId" class="input input--select" required [(ngModel)]="form.categoryId">
+            <option value="" disabled>Select a category...</option>
+            @for (cat of categories(); track cat.id) {
+              <option [ngValue]="cat.id">{{ cat.name }}</option>
+            }
+          </select>
+          @if (mode() === 'edit' && !form.categoryId) {
+            <p class="warn-hint"><mat-icon>error_outline</mat-icon> Please re-select category.</p>
+          }
+        </div>
+      </div>
+
+      <!-- Image upload -->
+      <div class="images">
+        <span class="label label--spaced">Product Images</span>
+        <div class="images__list">
+          @for (url of existingImages(); track $index; let i = $index) {
+            <div class="thumb">
+              <img class="thumb__img" [src]="url" alt="" />
+              @if (i === 0) {
+                <span class="thumb__cover">COVER</span>
+              }
+              <button type="button" class="thumb__remove" (click)="removeExisting.emit(i)" aria-label="Remove image">
+                <mat-icon>close</mat-icon>
+              </button>
+            </div>
+          }
+
+          @for (url of newImages(); track $index; let i = $index) {
+            <div class="thumb">
+              <img class="thumb__img" [src]="url" alt="" />
+              @if (existingImages().length === 0 && i === 0) {
+                <span class="thumb__cover">COVER</span>
+              }
+              <button type="button" class="thumb__remove" (click)="removeNew.emit(i)" aria-label="Remove image">
+                <mat-icon>close</mat-icon>
+              </button>
+            </div>
+          }
+
+          <button type="button" class="upload" (click)="fileInput.click()">
+            <mat-icon>upload</mat-icon>
+            <span>Add</span>
+          </button>
+          <input #fileInput class="images__file" type="file" accept="image/*" multiple (change)="filesSelected.emit($event)" />
+        </div>
+        <p class="images__note">
+          First image is used as the cover. Drag isn't supported yet — remove and re-add in order if you need to reorder.
+        </p>
+      </div>
+
+      @if (message().text) {
+        <div class="inline-msg" [class.inline-msg--error]="message().type === 'error'">
+          {{ message().text }}
+        </div>
+      }
+
+      <div class="modal__footer">
+        <button mat-stroked-button type="button" class="btn btn--outline" (click)="closed.emit()">Cancel</button>
+        <button mat-flat-button type="submit" class="btn btn--indigo" [disabled]="submitting()">
+          @if (submitting()) {
+            <span class="btn__content"
+              ><mat-icon class="spin">autorenew</mat-icon>
+              {{ mode() === 'add' ? 'Creating...' : 'Saving...' }}</span
+            >
+          } @else {
+            {{ mode() === 'add' ? 'Create Product' : 'Save Changes' }}
+          }
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,58 @@
+<div class="donut">
+  <div class="donut__chart">
+    <!-- Decorative glow behind the chart -->
+    <div class="donut__glow"></div>
+
+    <svg class="donut__svg" [attr.width]="size" [attr.height]="size" [attr.viewBox]="'0 0 ' + size + ' ' + size">
+      <!-- Base track -->
+      <circle class="donut__track" [attr.cx]="center" [attr.cy]="center" [attr.r]="radius" fill="none" [attr.stroke-width]="strokeWidth" />
+      <g [attr.transform]="rotate">
+        @for (seg of segments(); track $index; let i = $index) {
+          <circle
+            class="donut__segment"
+            [attr.cx]="center"
+            [attr.cy]="center"
+            [attr.r]="radius"
+            fill="none"
+            [attr.stroke]="seg.color"
+            [attr.stroke-width]="strokeWidth"
+            [attr.stroke-dasharray]="seg.length + ' ' + (circumference - seg.length)"
+            [attr.stroke-linecap]="segments().length > 1 ? 'butt' : 'round'"
+            [attr.stroke-dashoffset]="drawn() ? seg.dashoffset : circumference"
+            [style.transition-delay.s]="0.1 + i * 0.05"
+          />
+        }
+      </g>
+    </svg>
+
+    <!-- Central data display -->
+    <div class="donut__center">
+      <span class="donut__center-label">Revenue</span>
+      <span class="donut__center-value">{{ total() > 0 ? formatPrice()(total()) : '₹0' }}</span>
+    </div>
+  </div>
+
+  <!-- Legend -->
+  <div class="legend">
+    @if (segments().length === 0) {
+      <div class="legend__empty">
+        <p>No completed sales yet.</p>
+      </div>
+    } @else {
+      @for (seg of segments(); track $index; let i = $index) {
+        <div class="legend__row" [style.animation-delay.s]="0.4 + i * 0.1">
+          <div class="legend__label-cell">
+            <div class="legend__swatch">
+              <span class="legend__dot" [style.background-color]="seg.color" [style.box-shadow]="'0 0 8px ' + seg.color + '60'"></span>
+            </div>
+            <span class="legend__name">{{ seg.label }}</span>
+          </div>
+          <div class="legend__figures">
+            <span class="legend__amount">{{ formatPrice()(seg.value) }}</span>
+            <span class="legend__pct">{{ seg.pct }}%</span>
+          </div>
+        </div>
+      }
+    }
+  </div>
+</div>

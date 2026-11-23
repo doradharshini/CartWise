@@ -1,0 +1,23 @@
+<div class="coupon">
+  <div class="coupon__cut">
+    <div class="coupon__notch coupon__notch--left"></div>
+    <div class="coupon__dash"></div>
+    <div class="coupon__notch coupon__notch--right"></div>
+  </div>
+
+  <div class="coupon__top">
+    <div class="coupon__tag">
+      <mat-icon>confirmation_number</mat-icon> Cartwise Offer
+    </div>
+    <p class="coupon__value">{{ displayValue() }}</p>
+    <p class="coupon__note">on your next order</p>
+  </div>
+
+  <div class="coupon__bottom">
+    <div class="coupon__code">{{ displayCode() }}</div>
+    <div class="coupon__meta">
+      <span class="coupon__meta-item"><mat-icon>schedule</mat-icon> {{ displayDate() }}</span>
+      <span class="coupon__meta-item"><mat-icon>groups</mat-icon> {{ displayLimit() }}</span>
+    </div>
+  </div>
+</div>

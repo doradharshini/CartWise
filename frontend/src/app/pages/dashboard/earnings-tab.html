@@ -1,0 +1,73 @@
+@let e = state();
+<div class="earnings anim-in">
+  @if (productCount() === 0) {
+    <div class="empty">
+      <div class="empty__icon">
+        <mat-icon>trending_up</mat-icon>
+      </div>
+      <h3 class="empty__title">No earnings data yet</h3>
+      <p class="empty__text">Add products to your catalog and start making sales to see your revenue breakdown here.</p>
+    </div>
+  } @else if (e.isLoading) {
+    <div class="loading-card">
+      <mat-icon class="spin">autorenew</mat-icon> Calculating metrics...
+    </div>
+  } @else if (e.error) {
+    <div class="error-card">
+      <mat-icon>error_outline</mat-icon>
+      <div>{{ e.error }}</div>
+    </div>
+  } @else {
+    <div class="metrics-row">
+      <app-stat-card icon="account_balance_wallet" label="Total Revenue" [value]="formatPrice()(e.totalRevenue)" />
+      <app-stat-card icon="shopping_bag" label="Units Sold" [value]="e.totalUnits.toLocaleString('en-IN')" />
+      <app-stat-card icon="inventory_2" label="Active Listings" [value]="productCount()" />
+    </div>
+    <p class="earnings__footnote">* Revenue counts only orders with a completed payment status.</p>
+
+    <div class="earnings__panels">
+      <!-- Category breakdown donut -->
+      <div class="panel panel--padded panel--center">
+        <div class="panel__head">
+          <div class="panel__badge panel__badge--indigo">
+            <mat-icon>pie_chart</mat-icon>
+          </div>
+          <h3 class="panel__title">Revenue Distribution</h3>
+        </div>
+        <app-category-donut-chart [data]="e.categoryBreakdown" [formatPrice]="formatPrice()" />
+      </div>
+
+      <!-- Top products -->
+      @if (e.topProducts.length > 0) {
+        <div class="panel panel--column">
+          <div class="panel__head panel__head--bordered">
+            <div class="panel__badge panel__badge--amber">
+              <mat-icon>trending_up</mat-icon>
+            </div>
+            <h3 class="panel__title">Top Performing Products</h3>
+          </div>
+          <div class="top-table">
+            <table class="top-table__table">
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th class="top-table__right">Units</th>
+                  <th class="top-table__right">Revenue</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (p of e.topProducts; track p.id) {
+                  <tr class="top-table__row">
+                    <td class="top-table__name">{{ p.name }}</td>
+                    <td class="top-table__units top-table__right"><span>{{ p.quantitySold }}</span></td>
+                    <td class="top-table__revenue top-table__right">{{ formatPrice()(p.revenue) }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

@@ -1,0 +1,16 @@
+<div class="stat-card">
+  <!-- Decorative background icon watermark -->
+  <div class="stat-card__watermark">
+    <mat-icon>{{ icon() }}</mat-icon>
+  </div>
+
+  <div class="stat-card__content">
+    <div class="stat-card__head">
+      <div class="stat-card__icon">
+        <mat-icon>{{ icon() }}</mat-icon>
+      </div>
+      <span class="stat-card__label">{{ label() }}</span>
+    </div>
+    <p class="stat-card__value">{{ value() }}</p>
+  </div>
+</div>

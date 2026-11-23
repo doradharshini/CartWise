@@ -1,0 +1,209 @@
+@if (isLoading()) {
+  <div class="lifecycle-skeleton">
+    <div class="lifecycle-skeleton__back"></div>
+    <div class="lifecycle-skeleton__cols">
+      <div class="lifecycle-skeleton__main"></div>
+      <div class="lifecycle-skeleton__side"></div>
+    </div>
+  </div>
+} @else if (error() || !order()) {
+  <div class="lifecycle-error">
+    <mat-icon class="lifecycle-error__icon">error_outline</mat-icon>
+    <h2 class="lifecycle-error__title">Order Not Found</h2>
+    <p class="lifecycle-error__text">{{ error() }}</p>
+    <button mat-stroked-button (click)="goOrders()">Back to Orders</button>
+  </div>
+} @else {
+  @let o = order();
+  <div class="lifecycle-page">
+    <main class="lifecycle-main">
+      <button class="lifecycle-back" (click)="goOrders()">
+        <mat-icon class="lifecycle-back__icon">arrow_back</mat-icon> Back to orders
+      </button>
+
+      <!-- Success banner -->
+      @if (isNewOrder && !isCancelled()) {
+        <div class="banner">
+          <div class="banner__left">
+            <div class="banner__check">
+              <mat-icon class="banner__check-icon">check_circle</mat-icon>
+            </div>
+            <div class="banner__text">
+              <h2 class="banner__title">Order Placed Successfully!</h2>
+              <p class="banner__desc">
+                Thank you! Your order #{{ o.orderNumber?.slice(0, 8).toUpperCase() }} has been confirmed.
+              </p>
+            </div>
+          </div>
+          <div class="banner__actions">
+            <button mat-stroked-button class="banner__btn banner__btn--outline" (click)="goOrders()">View All Orders</button>
+            <button mat-flat-button class="banner__btn banner__btn--solid" (click)="goCatalog()">Continue Shopping</button>
+          </div>
+        </div>
+      }
+
+      <!-- Title row -->
+      <div class="lifecycle-title">
+        <div class="lifecycle-title__text">
+          <h1 class="lifecycle-title__heading">Order #{{ o.orderNumber?.slice(0, 8).toUpperCase() }}</h1>
+          <p class="lifecycle-title__sub">Placed on {{ formatDate(o.createdAt) }}</p>
+        </div>
+        <button mat-stroked-button class="lifecycle-title__invoice"><mat-icon>download</mat-icon> Download Invoice</button>
+      </div>
+
+      <div class="lifecycle-cols">
+        <!-- LEFT COLUMN -->
+        <div class="lifecycle-left">
+          <!-- Order status -->
+          <mat-card appearance="outlined" class="panel">
+            <h3 class="panel__title">
+              <mat-icon class="panel__title-icon">inventory_2</mat-icon> Order Status
+            </h3>
+            @if (isCancelled()) {
+              <div class="cancelled">
+                <div class="cancelled__icon-wrap">
+                  <mat-icon>cancel</mat-icon>
+                </div>
+                <div class="cancelled__text">
+                  <p class="cancelled__title">Order Cancelled</p>
+                  <p class="cancelled__desc">This order was cancelled and will not be shipped.</p>
+                </div>
+              </div>
+            } @else {
+              <div class="timeline">
+                <app-timeline-step
+                  icon="check"
+                  label="Order Confirmed"
+                  sublabel="Your order has been received securely."
+                  [active]="stepPlaced()"
+                  [lineActive]="stepProcessing()"
+                  [index]="0"
+                />
+                <app-timeline-step
+                  icon="check"
+                  label="Processing"
+                  sublabel="Your items are being prepared for shipment."
+                  [active]="stepProcessing()"
+                  [lineActive]="stepShipped()"
+                  [index]="1"
+                />
+                <app-timeline-step
+                  icon="local_shipping"
+                  label="Shipped"
+                  sublabel="Your package is on its way to the destination."
+                  [active]="stepShipped()"
+                  [lineActive]="stepDelivered()"
+                  [index]="2"
+                />
+                <app-timeline-step
+                  icon="place"
+                  label="Delivered"
+                  sublabel="Package delivered successfully to your address."
+                  [active]="stepDelivered()"
+                  [lineActive]="false"
+                  [last]="true"
+                  [index]="3"
+                />
+              </div>
+            }
+          </mat-card>
+
+          <!-- Order items -->
+          <mat-card appearance="outlined" class="panel">
+            <h3 class="panel__title">
+              <mat-icon class="panel__title-icon">shopping_bag</mat-icon> Order Items
+            </h3>
+            <div class="items">
+              @for (item of o.orderLineItems; track $index; let idx = $index) {
+                <div class="items__entry" [style.animation-delay.ms]="idx * 90">
+                  <div class="items__row">
+                    <div class="items__thumb">
+                      @if (item.imageUrl) {
+                        <img class="items__img" [src]="item.imageUrl" [alt]="item.name" />
+                      } @else {
+                        <mat-icon class="items__placeholder">image</mat-icon>
+                      }
+                    </div>
+                    <div class="items__info">
+                      <p class="items__name">{{ item.name }}</p>
+                      <p class="items__meta">SKU: {{ item.skuCode }} · Qty {{ item.quantity }}</p>
+                    </div>
+                    <p class="items__price">{{ formatPrice(item.price * item.quantity) }}</p>
+                  </div>
+                  @if (idx < o.orderLineItems.length - 1) {
+                    <mat-divider class="items__divider" />
+                  }
+                </div>
+              }
+            </div>
+          </mat-card>
+        </div>
+
+        <!-- RIGHT COLUMN -->
+        <div class="lifecycle-right">
+          <!-- Order summary -->
+          <mat-card appearance="outlined" class="panel">
+            <h3 class="panel__title panel__title--plain">Order Summary</h3>
+            <div class="summary">
+              <div class="summary__row">
+                <span>Subtotal</span>
+                <span class="summary__value">{{ formatPrice(subtotal()) }}</span>
+              </div>
+              <div class="summary__row">
+                <span>Shipping</span>
+                <span class="summary__value">{{ isFreeShipping() ? 'Free' : formatPrice(100) }}</span>
+              </div>
+              @if (hasDiscount()) {
+                <div class="summary__row summary__row--discount">
+                  <span>Discount Applied</span>
+                  <span>-{{ formatPrice(discount()) }}</span>
+                </div>
+              }
+
+              <mat-divider class="summary__divider" />
+
+              <div class="summary__total">
+                <span class="summary__total-label">
+                  {{ o.paymentMethod === 'COD' && o.paymentStatus !== 'COMPLETED' ? 'Amount to Pay' : 'Total Paid' }}
+                </span>
+                <span class="summary__total-value">{{ formatPrice(o.totalPrice) }}</span>
+              </div>
+
+              <mat-divider class="summary__divider summary__divider--spaced" />
+
+              <!-- Payment method -->
+              <div class="summary__payment">
+                <span class="summary__payment-heading">Payment Method</span>
+                <div class="summary__payment-box">
+                  @if (o.paymentMethod === 'PAYPAL') {
+                    <mat-icon class="summary__payment-icon summary__payment-icon--wallet">account_balance_wallet</mat-icon>
+                  } @else if (o.paymentMethod === 'COD') {
+                    <mat-icon class="summary__payment-icon summary__payment-icon--cash">payments</mat-icon>
+                  } @else {
+                    <mat-icon class="summary__payment-icon summary__payment-icon--card">credit_card</mat-icon>
+                  }
+                  <span class="summary__payment-name">{{ paymentLabel(o) }}</span>
+                  <span class="summary__pay-status summary__pay-status--{{ paymentStatusVariant(o.paymentStatus) }}">{{ o.paymentStatus }}</span>
+                </div>
+              </div>
+            </div>
+          </mat-card>
+
+          <!-- Shipping address -->
+          <mat-card appearance="outlined" class="panel">
+            <h3 class="panel__title">
+              <mat-icon class="panel__title-icon">place</mat-icon> Shipping Address
+            </h3>
+            <div class="address">
+              <p class="address__street">{{ o.shippingAddress?.street }}</p>
+              <p class="address__details">
+                {{ o.shippingAddress?.city }}, {{ o.shippingAddress?.state }}<br />
+                {{ o.shippingAddress?.zipCode }}, {{ o.shippingAddress?.country }}
+              </p>
+            </div>
+          </mat-card>
+        </div>
+      </div>
+    </main>
+  </div>
+}

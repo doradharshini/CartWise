@@ -1,0 +1,161 @@
+version: '3.8'
+
+services:
+  kafka:
+    image: apache/kafka:3.7.0
+    container_name: kafka
+    ports:
+      - "9092:9092"
+    environment:
+      - KAFKA_NODE_ID=0
+      - KAFKA_PROCESS_ROLES=broker,controller
+      - KAFKA_LISTENERS=PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092
+      - KAFKA_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      - KAFKA_CONTROLLER_QUORUM_VOTERS=0@kafka:9093
+      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+      - KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=1
+      - KAFKA_TRANSACTION_STATE_LOG_MIN_ISR=1
+      - KAFKA_LOG_DIRS=/var/lib/kafka/data
+      - CLUSTER_ID=ciWW7b2-Q2e7a3V3LhVb6w
+
+  postgres-user:
+    image: postgres:15-alpine
+    container_name: cartwise-postgres-user
+    environment:
+      POSTGRES_USER: cartwise
+      POSTGRES_PASSWORD: cartwise@postgres
+      POSTGRES_DB: user_service_db
+    ports:
+      - "15432:5432"
+    volumes:
+      - postgres-user-data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  postgres-product:
+    image: postgres:15-alpine
+    container_name: cartwise-postgres-product
+    environment:
+      POSTGRES_USER: cartwise
+      POSTGRES_PASSWORD: cartwise@postgres
+      POSTGRES_DB: product_service_db
+    ports:
+      - "15433:5432"
+    volumes:
+      - postgres-product-data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  postgres-inventory:
+    image: postgres:15-alpine
+    container_name: cartwise-postgres-inventory
+    environment:
+      POSTGRES_USER: cartwise
+      POSTGRES_PASSWORD: cartwise@postgres
+      POSTGRES_DB: inventory_service_db
+    ports:
+      - "5434:5432"
+    volumes:
+      - postgres-inventory-data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  postgres-order:
+    image: postgres:15-alpine
+    container_name: cartwise-postgres-order
+    environment:
+      POSTGRES_USER: cartwise
+      POSTGRES_PASSWORD: cartwise@postgres
+      POSTGRES_DB: order_service_db
+    ports:
+      - "5435:5432" # Host port 5435
+    volumes:
+      - postgres-order-data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  postgres-payment:
+    image: postgres:15-alpine
+    container_name: cartwise-postgres-payment
+    environment:
+      POSTGRES_USER: cartwise
+      POSTGRES_PASSWORD: cartwise@postgres
+      POSTGRES_DB: payment_service_db
+    ports:
+      - "5436:5432"
+    volumes:
+      - postgres-payment-data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  postgres-review:
+    image: postgres:15-alpine
+    container_name: cartwise-postgres-review
+    environment:
+      POSTGRES_USER: cartwise
+      POSTGRES_PASSWORD: cartwise@postgres
+      POSTGRES_DB: review_service_db
+    ports:
+      - "5437:5432"
+    volumes:
+      - postgres-review-data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  postgres-coupon:
+    image: postgres:15-alpine
+    container_name: cartwise-postgres-coupon
+    environment:
+      POSTGRES_USER: cartwise
+      POSTGRES_PASSWORD: cartwise@postgres
+      POSTGRES_DB: coupon_service_db
+    ports:
+      - "5438:5432"
+    volumes:
+      - postgres-coupon-data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: cartwise-redis
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+
+  mailhog:
+    image: mailhog/mailhog
+    container_name: mailhog
+    ports:
+      - "1025:1025" # SMTP Server Port (Spring Boot connects to this)
+      - "8025:8025" # Web UI Port
+
+  zipkin:
+    image: openzipkin/zipkin
+    container_name: zipkin
+    ports:
+      - "9411:9411"
+
+volumes:
+  postgres-user-data:
+    external: true
+    name: cartwise_postgres-user-data
+
+  postgres-product-data:
+    external: true
+    name: cartwise_postgres-product-data
+
+  postgres-inventory-data:
+    external: true
+    name: cartwise_postgres-inventory-data
+
+  postgres-order-data:
+    external: true
+    name: cartwise_postgres-order-data
+
+  postgres-payment-data:
+    external: true
+    name: cartwise_postgres-payment-data
+
+  postgres-review-data:
+    external: true
+    name: cartwise_postgres-review-data
+
+  postgres-coupon-data:
+    external: true
+    name: cartwise_postgres-coupon-data

@@ -1,0 +1,423 @@
+<div class="home">
+  <app-toast-banner [notification]="notification()" />
+
+  <main class="home__main">
+    <!-- ───────── Hero ───────── -->
+    <section class="hero">
+      <img
+        class="hero__image"
+        src="https://images.unsplash.com/photo-1727407209320-1fa6ae60ee05?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3ODc2NDd8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBzaG9wcGluZyUyMGVjb21tZXJjZSUyMHNhbGUlMjBiYW5uZXJ8ZW58MXwwfHx8MTc4MDIyMDc2OXww&ixlib=rb-4.1.0&q=80&w=1200"
+        alt="Sale banner"
+      />
+      <div class="hero__shade"></div>
+      <div class="hero__content">
+        <div class="hero__badges" appReveal [revealY]="28" [revealDuration]="500">
+          <span class="badge badge--white">Season Sale</span>
+          <span class="badge badge--yellow">
+            <mat-icon class="badge__icon">percent</mat-icon> Best-value picks
+          </span>
+        </div>
+        <h1 class="hero__title" appReveal [revealY]="28" [revealDelay]="80" [revealDuration]="500">
+          Up to 50% off<br />on top brands
+        </h1>
+        <p class="hero__text" appReveal [revealY]="28" [revealDelay]="160" [revealDuration]="500">
+          Discover thousands of products from trusted sellers around the world, with curated categories, better deals, and faster shopping on every visit.
+        </p>
+        <div class="hero__actions" appReveal [revealY]="28" [revealDelay]="240" [revealDuration]="500">
+          <button mat-flat-button class="hero__cta" (click)="go('/catalog')">
+            Shop Now <mat-icon iconPositionEnd>arrow_forward</mat-icon>
+          </button>
+          <button mat-stroked-button class="hero__cta hero__cta--ghost" (click)="scrollToCategories()">
+            Explore Categories <mat-icon iconPositionEnd>travel_explore</mat-icon>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ───────── Marquee ───────── -->
+    <div class="ticker">
+      <div class="ticker__viewport">
+        <div class="ticker__track">
+          @for (item of tickerItems; track $index) {
+            <span class="ticker__item">
+              <span class="ticker__dot"></span>
+              {{ item }}
+            </span>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- ───────── Flash deals ───────── -->
+    <section class="deals" appReveal>
+      <div class="deals__inner">
+        <div class="deals__glow"></div>
+        <div class="deals__intro">
+          <div class="deals__bolt">
+            <mat-icon class="deals__bolt-icon">bolt</mat-icon>
+          </div>
+          <div>
+            <p class="deals__eyebrow">Flash Deals</p>
+            <h3 class="deals__title">Lightning offers — today only</h3>
+            <p class="deals__sub">Handpicked deals refreshed every few hours</p>
+          </div>
+        </div>
+        <div class="deals__timer">
+          <div class="deals__ends">
+            <mat-icon class="deals__clock">schedule</mat-icon>
+            <span class="deals__ends-text">Ends in</span>
+          </div>
+          <div class="deals__units">
+            @for (unit of [{ v: countdown().h, l: 'Hrs' }, { v: countdown().m, l: 'Min' }, { v: countdown().s, l: 'Sec' }]; track unit.l; let last = $last) {
+              <div class="timer__unit">
+                <div class="timer__box">
+                  <span class="timer__value">{{ pad(unit.v) }}</span>
+                </div>
+                <span class="timer__label">{{ unit.l }}</span>
+              </div>
+              @if (!last) {
+                <span class="timer__sep">:</span>
+              }
+            }
+          </div>
+        </div>
+        <button mat-flat-button class="deals__button" (click)="go('/catalog')">View Deals</button>
+      </div>
+    </section>
+
+    <!-- ───────── Stats ───────── -->
+    <section class="stats">
+      @for (s of stats; track s.label; let i = $index) {
+        <div class="stat" appReveal [revealDelay]="i * 70" [revealY]="28" [revealDuration]="500">
+          <div class="stat__label-row">
+            <mat-icon class="stat__icon">{{ s.icon }}</mat-icon>
+            <span class="stat__label">{{ s.label }}</span>
+          </div>
+          <p class="stat__value">
+            <app-animated-counter [target]="s.value" [suffix]="s.suffix" />
+          </p>
+        </div>
+      }
+    </section>
+
+    <!-- ───────── Category showcase ───────── -->
+    <section id="category-showcase" class="categories">
+      <div class="heading heading--split" appReveal [revealY]="28" [revealDuration]="500">
+        <div>
+          <p class="heading__eyebrow">Discover more</p>
+          <h2 class="heading__title">Explore Popular Categories</h2>
+        </div>
+        <p class="heading__text">
+          Explore our most popular sections and discover top-rated products curated just for you. Find exactly what you need with ease.
+        </p>
+      </div>
+
+      <div class="categories__grid">
+        @for (cat of topCategories(); track cat.id; let i = $index) {
+          <a
+            class="cat-card"
+            appReveal
+            [revealDelay]="i * 70"
+            [revealY]="28"
+            [revealDuration]="500"
+            [routerLink]="['/category', cat.id]"
+            [queryParams]="{ name: cat.name }"
+          >
+            <img class="cat-card__img" [src]="getCategoryImage(cat.name, i)" [alt]="cat.name" />
+            <div class="cat-card__tint" [style.background]="getCategoryGradient(i)"></div>
+            <div class="cat-card__shade"></div>
+            <div class="cat-card__body">
+              <div class="cat-card__top">
+                <div class="cat-card__icon-box">
+                  <mat-icon>{{ getCategoryIcon(cat.name) }}</mat-icon>
+                </div>
+                <div class="cat-card__tag">Featured</div>
+              </div>
+              <div class="cat-card__text">
+                <h3 class="cat-card__title">{{ cat.name }}</h3>
+                <p class="cat-card__desc">
+                  Discover top picks, trending launches, and everyday bestsellers in {{ cat.name.toLowerCase() }}.
+                </p>
+                <div class="cat-card__link">
+                  Explore category
+                  <mat-icon class="cat-card__chevron">chevron_right</mat-icon>
+                </div>
+              </div>
+            </div>
+          </a>
+        }
+        @if (categories().length === 0 && !isLoading()) {
+          <div class="categories__empty">No categories found in the database.</div>
+        }
+      </div>
+    </section>
+
+    <!-- ───────── Browse categories (icon tiles) ───────── -->
+    <section class="browse">
+      <div class="browse__head">
+        <h2 class="browse__title">Browse Categories</h2>
+        <a class="browse__all" routerLink="/catalog">
+          View all <mat-icon class="browse__all-icon">chevron_right</mat-icon>
+        </a>
+      </div>
+      <div class="browse__grid">
+        @for (cat of topCategories(); track cat.id; let i = $index) {
+          <a
+            class="tile"
+            appReveal
+            [revealDelay]="i * 70"
+            [revealY]="28"
+            [revealDuration]="500"
+            [routerLink]="['/category', cat.id]"
+            [queryParams]="{ name: cat.name }"
+          >
+            <div class="tile__icon">
+              <mat-icon>{{ getCategoryIcon(cat.name) }}</mat-icon>
+            </div>
+            <span class="tile__label">{{ cat.name }}</span>
+          </a>
+        }
+      </div>
+    </section>
+
+    <!-- ───────── Perks ───────── -->
+    <section class="perks" appReveal [revealY]="28" [revealDuration]="500">
+      <div class="perks__panel">
+        <div class="perks__grid">
+          @for (p of perks; track p.title) {
+            <div class="perk">
+              <div class="icon-box icon-box--sm">
+                <mat-icon class="icon-box__icon icon-box__icon--sm">{{ p.icon }}</mat-icon>
+              </div>
+              <h3 class="perk__title">{{ p.title }}</h3>
+              <p class="perk__text">{{ p.desc }}</p>
+            </div>
+          }
+        </div>
+      </div>
+    </section>
+
+    <!-- ───────── Featured products ───────── -->
+    <section class="featured">
+      <div class="featured__head">
+        <h2 class="featured__title">Featured Products</h2>
+        <div class="featured__tools">
+          <!-- Jump to Category -->
+          <button
+            mat-stroked-button
+            class="featured__filter"
+            [matMenuTriggerFor]="filterMenu"
+            (menuOpened)="filterOpen.set(true)"
+            (menuClosed)="filterOpen.set(false)"
+          >
+            <mat-icon class="featured__filter-icon">tune</mat-icon> Filter
+            <mat-icon class="featured__chevron" [class.featured__chevron--open]="filterOpen()">expand_more</mat-icon>
+          </button>
+          <mat-menu #filterMenu="matMenu" xPosition="before">
+            <div class="featured__menu-title">Jump to Category</div>
+            @for (cat of categories(); track cat.id) {
+              <button mat-menu-item (click)="openCategory(cat)">
+                <span class="featured__menu-item">{{ cat.name }}</span>
+              </button>
+            }
+          </mat-menu>
+
+          <!-- Local sort -->
+          <app-sort-menu [(value)]="sort" />
+        </div>
+      </div>
+
+      @if (isLoading()) {
+        <div class="featured__grid">
+          @for (i of skeletons; track i) {
+            <div class="skeleton">
+              <div class="skeleton__image"></div>
+              <div class="skeleton__line"></div>
+              <div class="skeleton__line skeleton__line--short"></div>
+            </div>
+          }
+        </div>
+      } @else if (error()) {
+        <div class="featured__error">{{ error() }}</div>
+      } @else {
+        <div class="featured__grid">
+          @for (product of displayedProducts(); track product.id; let i = $index) {
+            <app-browse-product-card
+              [product]="product"
+              view="grid"
+              [index]="i"
+              [staggerMod]="12"
+              [adding]="addingSku() === product.skuCode"
+              [saved]="wishlist.isSaved(product.skuCode)"
+              (addToCart)="handleAddToCart(product.skuCode)"
+              (wishlist)="handleWishlist(product.skuCode)"
+            />
+          }
+
+          @if (showSellerCard()) {
+            <div appReveal [revealDelay]="displayedProducts().length * 70" [revealY]="28" [revealDuration]="500">
+              <div class="seller-card">
+                <div class="seller-card__icon">
+                  <mat-icon>storefront</mat-icon>
+                </div>
+                <div class="seller-card__text">
+                  <h3 class="seller-card__title">Start selling today</h3>
+                  <p class="seller-card__desc">Turn your products into steady income on Cartwise.</p>
+                </div>
+                <button mat-stroked-button class="seller-card__button" (click)="go(auth.isAuthenticated() ? '/become-seller' : '/login')">
+                  Become a Seller <mat-icon iconPositionEnd class="seller-card__button-icon">arrow_forward</mat-icon>
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </section>
+
+    <!-- ───────── Editor's pick ───────── -->
+    <section class="editors" appReveal [revealY]="28" [revealDuration]="500">
+      <div class="editors__grid">
+        <div class="editors__hero">
+          <img class="editors__img" src="https://images.unsplash.com/photo-1511556820780-d912e42b4980?auto=format&fit=crop&w=1200&q=80" alt="Featured shopping lifestyle" />
+          <div class="editors__shade"></div>
+          <div class="editors__body">
+            <p class="editors__eyebrow">Editor’s pick</p>
+            <h2 class="editors__title">Fresh arrivals for every kind of shopper</h2>
+            <p class="editors__text">
+              From everyday essentials to premium upgrades, discover items that perfectly match your lifestyle. Shop the latest trends and exclusive deals.
+            </p>
+            <div class="editors__action">
+              <button mat-flat-button class="editors__button" (click)="go('/catalog')">
+                Discover More <mat-icon iconPositionEnd>arrow_forward</mat-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="editors__services">
+          @for (s of services; track s.title) {
+            <div class="service">
+              <div class="icon-box icon-box--md">
+                <mat-icon class="icon-box__icon icon-box__icon--md">{{ s.icon }}</mat-icon>
+              </div>
+              <h3 class="service__title">{{ s.title }}</h3>
+              <p class="service__text">{{ s.desc }}</p>
+            </div>
+          }
+        </div>
+      </div>
+    </section>
+
+    <!-- ───────── Why us ───────── -->
+    <section class="why">
+      <div class="heading heading--center" appReveal [revealY]="28" [revealDuration]="500">
+        <p class="heading__eyebrow">Why us</p>
+        <h2 class="heading__title">Built for trust, built for you</h2>
+      </div>
+      <div class="why__grid">
+        @for (t of trust; track t.title; let i = $index) {
+          <div class="why__card" appReveal [revealDelay]="i * 80" [revealY]="28" [revealDuration]="500">
+            <div class="icon-box icon-box--md icon-box--soft">
+              <mat-icon class="icon-box__icon icon-box__icon--md">{{ t.icon }}</mat-icon>
+            </div>
+            <div>
+              <h3 class="why__title">{{ t.title }}</h3>
+              <p class="why__text">{{ t.desc }}</p>
+            </div>
+          </div>
+        }
+      </div>
+    </section>
+
+    <!-- ───────── Trending now ───────── -->
+    <section class="trending" appReveal [revealY]="28" [revealDuration]="500">
+      <div class="trending__panel">
+        <div class="trending__fade"></div>
+        <div class="trending__copy">
+          <div class="trending__tag">
+            <mat-icon class="trending__tag-icon">trending_up</mat-icon>
+            <span class="trending__tag-text">Trending Now</span>
+          </div>
+          <h2 class="trending__title">The most-loved products<br />this week</h2>
+          <p class="trending__text">
+            Curated from real buyer activity — the items your community can't stop buying.
+          </p>
+          <div>
+            <button mat-flat-button class="trending__button" (click)="go('/catalog')">
+              Explore Catalog <mat-icon iconPositionEnd>arrow_forward</mat-icon>
+            </button>
+          </div>
+        </div>
+        <div class="trending__emojis">
+          @for (emoji of emojis; track $index) {
+            <div class="trending__emoji" appReveal [revealDelay]="$index * 70" [revealY]="0" [revealScale]="0.7" [revealDuration]="350">
+              {{ emoji }}
+            </div>
+          }
+        </div>
+      </div>
+    </section>
+
+    <!-- ───────── Trending styles & tech ───────── -->
+    <section class="styles">
+      <div class="heading heading--row" appReveal [revealY]="28" [revealDuration]="500">
+        <div>
+          <p class="heading__eyebrow">More to explore</p>
+          <h2 class="heading__title">Trending Styles &amp; Tech</h2>
+        </div>
+      </div>
+      <div class="styles__grid">
+        <div class="styles__photo" appReveal [revealY]="28" [revealDelay]="80" [revealDuration]="500">
+          <img class="styles__img" src="https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=1200&q=80" alt="Online shopping fashion" />
+          <div class="styles__photo-body">
+            <h3 class="styles__photo-title">Premium Collections</h3>
+            <p class="styles__photo-text">
+              Explore our exclusive range of high-end products, carefully sourced and curated for the modern lifestyle.
+            </p>
+          </div>
+        </div>
+        <div class="styles__promo" appReveal [revealY]="28" [revealDelay]="160" [revealDuration]="500">
+          <div class="icon-box icon-box--lg">
+            <mat-icon class="icon-box__icon icon-box__icon--lg">auto_awesome</mat-icon>
+          </div>
+          <h3 class="styles__promo-title">A Seamless Shopping Experience</h3>
+          <p class="styles__promo-text">
+            Enjoy a world-class shopping journey with personalized recommendations, secure checkouts, real-time stock updates, and lightning-fast delivery.
+          </p>
+          <div class="styles__promo-action">
+            <button mat-stroked-button class="styles__button" (click)="go('/catalog')">
+              Browse Everything <mat-icon iconPositionEnd>arrow_forward</mat-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ───────── Newsletter ───────── -->
+    <section class="newsletter" appReveal [revealY]="28" [revealDuration]="500">
+      <div class="newsletter__panel">
+        <div class="newsletter__orb newsletter__orb--start"></div>
+        <div class="newsletter__orb newsletter__orb--end"></div>
+        <div class="newsletter__icon">
+          <mat-icon>mail_outline</mat-icon>
+        </div>
+        <div class="newsletter__copy">
+          <h2 class="newsletter__title">Get deals before anyone else</h2>
+          <p class="newsletter__text">Subscribe to Cartwise updates. No spam, just the deals that matter.</p>
+        </div>
+        <div class="newsletter__form">
+          <input
+            class="newsletter__input"
+            type="email"
+            name="email"
+            aria-label="Email address"
+            placeholder="you@example.com"
+            [(ngModel)]="email"
+          />
+          <button mat-flat-button class="newsletter__button">Subscribe</button>
+        </div>
+        <p class="newsletter__legal">By subscribing you agree to our Privacy Policy. Unsubscribe anytime.</p>
+      </div>
+    </section>
+  </main>
+</div>

@@ -1,0 +1,182 @@
+<div class="coupons">
+  <!-- Toast -->
+  @if (notification().show) {
+    <div class="toast fade-up">
+      <div class="toast__body" [class.toast__body--error]="notification().type === 'error'">
+        <mat-icon>{{ notification().type === 'error' ? 'error_outline' : 'check_circle' }}</mat-icon>
+        {{ notification().message }}
+      </div>
+    </div>
+  }
+
+  <div class="coupons__container">
+    <!-- Page header -->
+    <div class="header fade-up">
+      <div class="header__icon">
+        <mat-icon>confirmation_number</mat-icon>
+      </div>
+      <div>
+        <h1 class="header__title">Coupon Management</h1>
+        <p class="header__subtitle">Create and manage promotional discount codes</p>
+      </div>
+    </div>
+
+    <div class="coupons__layout">
+      <!-- Form Card -->
+      <div class="fade-up">
+        <div class="panel">
+          <div class="panel__header">
+            <div class="panel__glow"></div>
+            <div class="panel__header-icon">
+              <mat-icon>auto_awesome</mat-icon>
+            </div>
+            <div class="panel__header-text">
+              <h2 class="panel__title">New Promotion</h2>
+              <p class="panel__subtitle">Fill in the details to generate a coupon code.</p>
+            </div>
+          </div>
+
+          <div class="panel__body">
+            <form class="form" (ngSubmit)="handleSubmit()">
+              <div class="form__row">
+                <div>
+                  <label class="field__label" for="cp-code">Coupon Code</label>
+                  <div class="field__wrap">
+                    <mat-icon class="field__icon">sell</mat-icon>
+                    <input
+                      id="cp-code"
+                      name="code"
+                      class="field__input field__input--padded field__input--code"
+                      [(ngModel)]="formData.code"
+                      placeholder="e.g., SUMMER50"
+                      required
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label class="field__label" for="cp-type">Discount Type</label>
+                  <select id="cp-type" name="discountType" class="field__input" [(ngModel)]="formData.discountType">
+                    <option value="PERCENTAGE">Percentage (%)</option>
+                    <option value="FLAT_AMOUNT">Flat Amount (₹)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label class="field__label" for="cp-value">Discount Value</label>
+                <div class="field__wrap">
+                  <div class="field__prefix">
+                    @if (formData.discountType === 'PERCENTAGE') {
+                      <mat-icon>percent</mat-icon>
+                    } @else {
+                      ₹
+                    }
+                  </div>
+                  <input
+                    id="cp-value"
+                    name="discountValue"
+                    type="number"
+                    min="1"
+                    class="field__input field__input--padded"
+                    [step]="formData.discountType === 'PERCENTAGE' ? '1' : '0.01'"
+                    [(ngModel)]="formData.discountValue"
+                    [placeholder]="formData.discountType === 'PERCENTAGE' ? '20' : '500'"
+                    required
+                  />
+                </div>
+                @if (formData.discountType === 'PERCENTAGE' && formData.discountValue > 0) {
+                  <p class="field__hint">Customers save {{ formData.discountValue }}% on their order total.</p>
+                }
+              </div>
+
+              <div class="form__row">
+                <div>
+                  <label class="field__label" for="cp-expiry">Expiration Date</label>
+                  <div class="field__wrap">
+                    <mat-icon class="field__icon">calendar_today</mat-icon>
+                    <input
+                      id="cp-expiry"
+                      name="expirationDate"
+                      type="date"
+                      class="field__input field__input--padded"
+                      [(ngModel)]="formData.expirationDate"
+                      required
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label class="field__label" for="cp-limit">Usage Limit</label>
+                  <div class="field__wrap">
+                    <mat-icon class="field__icon">tag</mat-icon>
+                    <input
+                      id="cp-limit"
+                      name="usageLimit"
+                      type="number"
+                      min="1"
+                      class="field__input field__input--padded"
+                      [(ngModel)]="formData.usageLimit"
+                      placeholder="e.g., 100"
+                      required
+                    />
+                  </div>
+                  <p class="field__hint">Max number of times this code can be redeemed.</p>
+                </div>
+              </div>
+
+              <!-- Summary strip -->
+              <div class="summary">
+                @for (s of summary(); track s.label) {
+                  <div class="summary__item">
+                    <mat-icon>{{ s.icon }}</mat-icon>
+                    <span class="summary__label">{{ s.label }}:</span>
+                    <span class="summary__value">{{ s.value }}</span>
+                  </div>
+                }
+              </div>
+
+              <button mat-flat-button type="submit" class="submit" [disabled]="isLoading()">
+                @if (isLoading()) {
+                  <span class="submit__content"><mat-icon class="spin">autorenew</mat-icon> Minting Coupon…</span>
+                } @else {
+                  <span class="submit__content"><mat-icon>add</mat-icon> Create Coupon</span>
+                }
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Preview -->
+      <div class="aside fade-up" style="animation-delay: 120ms">
+        <div class="panel">
+          <div class="preview-head">
+            <mat-icon>verified</mat-icon>
+            <span class="preview-head__title">Live Preview</span>
+            <span class="preview-head__note">Updates as you type</span>
+          </div>
+          <div class="preview-body">
+            <app-coupon-preview
+              [code]="formData.code"
+              [discountType]="formData.discountType"
+              [discountValue]="formData.discountValue"
+              [expirationDate]="formData.expirationDate"
+              [usageLimit]="formData.usageLimit"
+            />
+          </div>
+        </div>
+
+        <div class="tips">
+          <p class="tips__title">Tips</p>
+          <ul class="tips__list">
+            @for (tip of tips; track tip) {
+              <li class="tips__item">
+                <mat-icon>check_circle</mat-icon>
+                {{ tip }}
+              </li>
+            }
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

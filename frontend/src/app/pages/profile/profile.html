@@ -1,0 +1,192 @@
+@if (isLoading()) {
+  <div class="profile-skeleton">
+    <div class="profile-skeleton__title"></div>
+    <div class="profile-skeleton__grid">
+      <div class="profile-skeleton__card"></div>
+      <div class="profile-skeleton__card profile-skeleton__card--wide"></div>
+    </div>
+  </div>
+} @else {
+  <div class="profile">
+    @if (showVerifyModal()) {
+      <app-verify-email-modal (closed)="showVerifyModal.set(false)" (verified)="handleVerified()" />
+    }
+
+    <main class="profile__main">
+      <!-- Header -->
+      <div class="header fade-up">
+        <div class="header__text">
+          <span class="header__eyebrow">
+            <mat-icon>auto_awesome</mat-icon> Account
+          </span>
+          <h1 class="header__title">My Profile</h1>
+        </div>
+      </div>
+
+      <div class="profile__grid">
+        <!-- LEFT — Identity Card -->
+        <div class="slide-left identity-wrap">
+          <div class="identity">
+            <div class="identity__hero">
+              <div class="identity__grid-overlay"></div>
+              <div class="identity__glow-wrap">
+                <div class="identity__glow"></div>
+              </div>
+
+              <div class="identity__avatar avatar-pop">
+                <span>{{ initials }}</span>
+              </div>
+
+              <p class="identity__name">{{ fullName }}</p>
+              <p class="identity__username">
+                <mat-icon>alternate_email</mat-icon>
+                {{ profileData()?.username }}
+              </p>
+            </div>
+
+            <!-- Role badge -->
+            <div class="identity__role-row">
+              <span class="role-badge" [class]="'role-badge role-badge--' + roleKey">
+                {{ profileData()?.role }}
+              </span>
+            </div>
+
+            <!-- Stat rows -->
+            <div class="stats">
+              <div class="stats__divider"></div>
+
+              <!-- Status -->
+              <div class="stat fade-up">
+                <div class="stat__icon">
+                  <mat-icon [class]="profileData()?.isActive ? 'tone-good' : 'tone-bad'">verified_user</mat-icon>
+                </div>
+                <span class="stat__label">Status</span>
+                <span class="stat__value" [class]="profileData()?.isActive ? 'stat__value tone-good-text' : 'stat__value tone-bad-text'">
+                  {{ profileData()?.isActive ? 'Active' : 'Inactive' }}
+                </span>
+              </div>
+
+              <!-- Email -->
+              <div class="stat fade-up" style="animation-delay: 80ms">
+                <div class="stat__icon">
+                  <mat-icon [class]="profileData()?.emailVerified ? 'tone-good' : 'tone-warn'">check_circle</mat-icon>
+                </div>
+                <span class="stat__label">Email</span>
+                <span
+                  class="stat__value"
+                  [class]="profileData()?.emailVerified ? 'stat__value tone-good-text' : 'stat__value tone-warn-text'"
+                >
+                  {{ profileData()?.emailVerified ? 'Verified' : 'Unverified' }}
+                  @if (!profileData()?.emailVerified) {
+                    <button class="stat__action" (click)="showVerifyModal.set(true)">Verify</button>
+                  }
+                </span>
+              </div>
+
+              <!-- Member since -->
+              <div class="stat fade-up" style="animation-delay: 160ms">
+                <div class="stat__icon">
+                  <mat-icon class="tone-info">calendar_today</mat-icon>
+                </div>
+                <span class="stat__label">Member since</span>
+                <span class="stat__value stat__value--plain">{{ joinDate }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT — Edit Form -->
+        <div class="slide-right profile__form-col">
+          <div class="edit-card">
+            <div class="edit-card__header">
+              <div class="edit-card__heading">
+                <h2 class="edit-card__title">
+                  <mat-icon>edit</mat-icon> Personal Information
+                </h2>
+                <p class="edit-card__subtitle">Update your details below and save.</p>
+              </div>
+            </div>
+
+            <div class="edit-card__body">
+              <form class="form" [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+                @if (error()) {
+                  <div class="alert alert--error">
+                    <mat-icon>error_outline</mat-icon>
+                    {{ error() }}
+                  </div>
+                }
+
+                @if (successMsg()) {
+                  <div class="alert alert--success">
+                    <mat-icon>check_circle</mat-icon>
+                    {{ successMsg() }}
+                  </div>
+                }
+
+                <div class="form__row">
+                  <div class="field">
+                    <label for="firstName" class="field__label">
+                      <mat-icon>person_outline</mat-icon> First Name
+                    </label>
+                    <input id="firstName" class="field__input" formControlName="firstName" [attr.disabled]="isSaving() ? '' : null" />
+                    @if (fieldError('firstName'); as msg) {
+                      <p class="field__error">{{ msg }}</p>
+                    }
+                  </div>
+                  <div class="field">
+                    <label for="lastName" class="field__label">
+                      <mat-icon>person_outline</mat-icon> Last Name
+                    </label>
+                    <input id="lastName" class="field__input" formControlName="lastName" [attr.disabled]="isSaving() ? '' : null" />
+                    @if (fieldError('lastName'); as msg) {
+                      <p class="field__error">{{ msg }}</p>
+                    }
+                  </div>
+                </div>
+
+                <div class="field">
+                  <label for="email" class="field__label">
+                    <mat-icon>mail_outline</mat-icon> Email Address
+                  </label>
+                  <div class="field__wrap">
+                    <mat-icon class="field__icon">mail_outline</mat-icon>
+                    <input id="email" class="field__input field__input--icon" formControlName="email" [attr.disabled]="isSaving() ? '' : null" />
+                  </div>
+                  @if (fieldError('email'); as msg) {
+                    <p class="field__error">{{ msg }}</p>
+                  }
+                </div>
+
+                <div class="field">
+                  <label for="phoneNumber" class="field__label">
+                    <mat-icon>phone</mat-icon> Phone Number
+                  </label>
+                  <div class="field__wrap">
+                    <mat-icon class="field__icon">phone</mat-icon>
+                    <input id="phoneNumber" class="field__input field__input--icon" formControlName="phoneNumber" [attr.disabled]="isSaving() ? '' : null" />
+                  </div>
+                  @if (fieldError('phoneNumber'); as msg) {
+                    <p class="field__error">{{ msg }}</p>
+                  }
+                </div>
+
+                <div class="form__divider"></div>
+
+                <div class="form__footer">
+                  <p class="form__note">Changes are saved to your account immediately.</p>
+                  <button mat-flat-button type="submit" class="submit" [disabled]="isSaving()">
+                    @if (isSaving()) {
+                      <span class="submit__content"><span class="submit__spinner"></span> Saving…</span>
+                    } @else {
+                      <span class="submit__content">Save Changes <mat-icon>arrow_forward</mat-icon></span>
+                    }
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+}

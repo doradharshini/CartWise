@@ -1,0 +1,125 @@
+<header class="navbar">
+  <div class="navbar__glow"></div>
+
+  <div class="navbar__bar">
+    <!-- Logo -->
+    <a routerLink="/" class="logo">
+      <div class="logo__core">
+        <mat-icon>inventory_2</mat-icon>
+      </div>
+      <span class="logo__text">Cartwise</span>
+    </a>
+
+    <!-- Search (desktop) -->
+    <div class="search search--desktop">
+      <mat-icon class="search__icon">search</mat-icon>
+      <input
+        type="text"
+        placeholder="Search for products, brands and more..."
+        aria-label="Search products"
+        class="search__input"
+        [(ngModel)]="searchQuery"
+        (keydown.enter)="search()"
+      />
+    </div>
+
+    <!-- Right links -->
+    <div class="actions">
+      <button mat-icon-button (click)="theme.toggle()" aria-label="Toggle theme">
+        <mat-icon>{{ theme.theme() === 'dark' ? 'light_mode' : 'dark_mode' }}</mat-icon>
+      </button>
+
+      <!-- Account -->
+      @if (auth.isAuthenticated()) {
+        <button mat-button [matMenuTriggerFor]="accountMenu" class="actions__menu-btn">
+          <mat-icon>person_outline</mat-icon>
+          <span class="actions__label">Account</span>
+          <mat-icon iconPositionEnd>expand_more</mat-icon>
+        </button>
+        <mat-menu #accountMenu="matMenu" xPosition="before">
+          <a mat-menu-item routerLink="/profile"><mat-icon>person_outline</mat-icon><span>My Profile</span></a>
+          @if (auth.role() === 'SELLER' || auth.role() === 'ADMIN') {
+            <a mat-menu-item routerLink="/dashboard"><mat-icon>storefront</mat-icon><span>Seller Dashboard</span></a>
+          }
+          @if (auth.role() === 'ADMIN') {
+            <a mat-menu-item routerLink="/admin/coupons"><mat-icon>confirmation_number</mat-icon><span>Manage Coupons</span></a>
+            <a mat-menu-item routerLink="/admin/orders"><mat-icon>inventory</mat-icon><span>Manage Orders</span></a>
+          }
+          @if (auth.role() === 'BUYER') {
+            <a mat-menu-item routerLink="/become-seller"><mat-icon>storefront</mat-icon><span>Become a Seller</span></a>
+          }
+          <a mat-menu-item routerLink="/orders"><mat-icon>inventory</mat-icon><span>Orders</span></a>
+          <a mat-menu-item routerLink="/addresses"><mat-icon>place</mat-icon><span>Saved Addresses</span></a>
+          <button mat-menu-item (click)="logout()"><mat-icon>logout</mat-icon><span>Logout</span></button>
+        </mat-menu>
+      } @else {
+        <button mat-button [matMenuTriggerFor]="guestMenu" class="actions__menu-btn">
+          <mat-icon>person_outline</mat-icon>
+          <span class="actions__label">Login</span>
+          <mat-icon iconPositionEnd>expand_more</mat-icon>
+        </button>
+        <mat-menu #guestMenu="matMenu" xPosition="before">
+          <a mat-menu-item routerLink="/login"><mat-icon>login</mat-icon><span>Login</span></a>
+          <a mat-menu-item routerLink="/register"><mat-icon>person_add</mat-icon><span>Sign Up</span></a>
+          <a mat-menu-item routerLink="/login"><mat-icon>inventory</mat-icon><span>Orders</span></a>
+          <a mat-menu-item routerLink="/login"><mat-icon>favorite_border</mat-icon><span>Wishlist</span></a>
+          <a mat-menu-item routerLink="/login"><mat-icon>storefront</mat-icon><span>Become a Seller</span></a>
+        </mat-menu>
+      }
+
+      <!-- More (desktop) -->
+      <button mat-button [matMenuTriggerFor]="moreMenu" class="actions__menu-btn actions__menu-btn--desktop">
+        <span>More</span>
+        <mat-icon iconPositionEnd>expand_more</mat-icon>
+      </button>
+      <mat-menu #moreMenu="matMenu" xPosition="before">
+        <a mat-menu-item [routerLink]="sellerLink()"><mat-icon>storefront</mat-icon><span>Become a Seller</span></a>
+        <button mat-menu-item><mat-icon>notifications_none</mat-icon><span>Notifications</span></button>
+        <button mat-menu-item><mat-icon>headset_mic</mat-icon><span>Customer Care</span></button>
+        <button mat-menu-item><mat-icon>trending_up</mat-icon><span>Advertise</span></button>
+        <button mat-menu-item><mat-icon>download</mat-icon><span>Download App</span></button>
+      </mat-menu>
+
+      <!-- Wishlist -->
+      @if (auth.isAuthenticated()) {
+        <a routerLink="/wishlist" class="nav-link nav-link--heart">
+          <span class="nav-link__icon">
+            <mat-icon>favorite_border</mat-icon>
+            @if (wishlistCount() > 0) {
+              @for (k of [badgeKey()]; track k) {
+                <span class="count-badge count-badge--red badge-pop">{{ wishlistCount() }}</span>
+              }
+            }
+          </span>
+          <span class="actions__label">Wishlist</span>
+        </a>
+      }
+
+      <!-- Cart -->
+      <a routerLink="/cart" class="nav-link">
+        <span class="nav-link__icon">
+          <mat-icon>shopping_cart</mat-icon>
+          @if (cart.count() > 0) {
+            <span class="count-badge count-badge--dark">{{ cart.count() }}</span>
+          }
+        </span>
+        <span class="actions__label">Cart</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Search (mobile) -->
+  <div class="navbar__mobile-search">
+    <div class="search">
+      <mat-icon class="search__icon">search</mat-icon>
+      <input
+        type="text"
+        placeholder="Search products…"
+        aria-label="Search products"
+        class="search__input search__input--compact"
+        [(ngModel)]="searchQuery"
+        (keydown.enter)="search()"
+      />
+    </div>
+  </div>
+</header>

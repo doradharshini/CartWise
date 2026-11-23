@@ -1,0 +1,160 @@
+@if (isLoading()) {
+  <div class="catalog__container">
+    <h1 class="catalog__loading-title" appReveal [revealY]="16">All Products</h1>
+    <div class="catalog__grid">
+      @for (i of skeletons; track i) {
+        <div class="skeleton" appReveal [revealDelay]="i * 60">
+          <div class="skeleton__image"></div>
+          <div class="skeleton__line"></div>
+          <div class="skeleton__line skeleton__line--short"></div>
+        </div>
+      }
+    </div>
+  </div>
+} @else if (error()) {
+  <div class="catalog__state" appReveal [revealY]="20">
+    <mat-icon class="catalog__state-icon catalog__state-icon--error">error_outline</mat-icon>
+    <h2 class="catalog__state-title">Oops! Something went wrong</h2>
+    <p class="catalog__state-text">{{ error() }}</p>
+    <button mat-stroked-button class="catalog__retry" (click)="reload()">Try Again</button>
+  </div>
+} @else if (products().length === 0) {
+  <div class="catalog__state catalog__state--center" appReveal [revealY]="20">
+    <mat-icon class="catalog__state-icon catalog__state-icon--empty">production_quantity_limits</mat-icon>
+    <h2 class="catalog__state-title catalog__state-title--tight">No Products Found</h2>
+    <p class="catalog__state-text catalog__state-text--flush">It looks like the catalog is currently empty.</p>
+  </div>
+} @else {
+  <div class="catalog">
+    <app-toast-banner [notification]="notification()" />
+
+    <main class="catalog__container catalog__container--main">
+      <!-- Page Header -->
+      <div class="catalog__header">
+        <h1 class="catalog__title" appReveal>All Products</h1>
+        <p class="catalog__subtitle" appReveal [revealDelay]="70">
+          @if (filtered().length === products().length) {
+            Showing all {{ products().length }} items
+          } @else {
+            Showing {{ filtered().length }} of {{ products().length }} items
+          }
+        </p>
+      </div>
+
+      <!-- Toolbar -->
+      <div class="toolbar" appReveal [revealY]="16" [revealDelay]="100">
+        <div class="toolbar__row">
+          <!-- Search -->
+          <div class="search">
+            <mat-icon class="search__icon">search</mat-icon>
+            <input
+              class="search__input"
+              type="text"
+              aria-label="Search products"
+              placeholder="Search products…"
+              [ngModel]="search()"
+              (ngModelChange)="search.set($event)"
+            />
+            @if (search()) {
+              <button type="button" class="search__clear" aria-label="Clear search" (click)="search.set('')">
+                <mat-icon class="search__clear-icon">close</mat-icon>
+              </button>
+            }
+          </div>
+
+          <div class="toolbar__actions">
+            <app-sort-menu [(value)]="sort" />
+
+            <!-- View toggle -->
+            <div class="view-toggle">
+              @for (v of [{ icon: 'grid_view', val: 'grid' }, { icon: 'view_list', val: 'list' }]; track v.val) {
+                <button
+                  type="button"
+                  class="view-toggle__button"
+                  [class.view-toggle__button--active]="view() === v.val"
+                  [attr.aria-label]="v.val + ' view'"
+                  (click)="view.set($any(v.val))"
+                >
+                  <mat-icon class="view-toggle__icon">{{ v.icon }}</mat-icon>
+                </button>
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- Category Pills -->
+        @if (categories().length > 1) {
+          <div class="pills">
+            @for (cat of categories(); track cat) {
+              <button
+                type="button"
+                class="pills__pill"
+                [class.pills__pill--active]="activeCategory() === cat"
+                (click)="activeCategory.set(cat)"
+              >
+                {{ cat }}
+              </button>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- Active Filter Tags -->
+      @if (hasFilters()) {
+        <div class="filters">
+          <span class="filters__label">Active filters:</span>
+          @if (search()) {
+            <button type="button" class="filters__tag" (click)="search.set('')">
+              "{{ search() }}" <mat-icon class="filters__tag-icon">close</mat-icon>
+            </button>
+          }
+          @if (activeCategory() !== 'All') {
+            <button type="button" class="filters__tag" (click)="activeCategory.set('All')">
+              {{ activeCategory() }} <mat-icon class="filters__tag-icon">close</mat-icon>
+            </button>
+          }
+          @if (sort() !== 'default') {
+            <button type="button" class="filters__tag" (click)="sort.set('default')">
+              {{ sortLabel(sort()) }} <mat-icon class="filters__tag-icon">close</mat-icon>
+            </button>
+          }
+          <button type="button" class="filters__clear" (click)="clearAll()">Clear all</button>
+        </div>
+      }
+
+      <!-- No Results / Product Grid -->
+      @if (filtered().length === 0) {
+        <div class="no-results" appReveal [revealY]="20">
+          <mat-icon class="no-results__icon">production_quantity_limits</mat-icon>
+          <h3 class="no-results__title">No products match your filters</h3>
+          <p class="no-results__text">Try adjusting the search term or clearing the active filters.</p>
+          <button mat-stroked-button class="no-results__button" (click)="clearAll()">Clear all filters</button>
+        </div>
+      } @else {
+        @for (key of [view() + '-' + activeCategory() + '-' + sort()]; track key) {
+          <div
+            class="results"
+            [class.results--grid]="view() === 'grid'"
+            [class.results--list]="view() === 'list'"
+            appReveal
+            [revealY]="0"
+            [revealDuration]="200"
+          >
+            @for (product of filtered(); track product.id; let i = $index) {
+              <app-browse-product-card
+                [product]="product"
+                [view]="view()"
+                [index]="i"
+                [staggerMod]="8"
+                [adding]="addingSku() === product.skuCode"
+                [saved]="wishlist.isSaved(product.skuCode)"
+                (addToCart)="handleAddToCart(product.skuCode)"
+                (wishlist)="handleWishlist(product.skuCode)"
+              />
+            }
+          </div>
+        }
+      }
+    </main>
+  </div>
+}

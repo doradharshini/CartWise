@@ -1,0 +1,65 @@
+<div class="backdrop anim-fade">
+  <div class="modal modal--medium anim-pop">
+    <div class="modal__header modal__header--compact">
+      <div>
+        <h3 class="modal__title modal__title--small">Manage Stock</h3>
+        <p class="modal__subtitle modal__subtitle--clamped">{{ product().name }}</p>
+      </div>
+      <button class="modal__close" (click)="closed.emit()" aria-label="Close">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <div class="stock">
+      <div class="stock__current">
+        <div class="stock__current-left">
+          <div class="stock__icon">
+            <mat-icon>inventory_2</mat-icon>
+          </div>
+          <div>
+            <p class="stock__label">Current Stock</p>
+            <p class="stock__sku">SKU: {{ product().skuCode }}</p>
+          </div>
+        </div>
+        <div class="stock__value">
+          @if (isChecking()) {
+            <mat-icon class="spin stock__spinner">autorenew</mat-icon>
+          } @else {
+            {{ currentStock() }}
+          }
+        </div>
+      </div>
+
+      @if (message().text) {
+        <div class="notice notice--modal" [class.notice--error]="message().type === 'error'">
+          <mat-icon>{{ message().type === 'error' ? 'error_outline' : 'check_circle' }}</mat-icon>
+          <span>{{ message().text }}</span>
+        </div>
+      }
+
+      <form class="stock__form" (ngSubmit)="submit()">
+        <div>
+          <label for="qty" class="label">Quantity to Add</label>
+          <input
+            id="qty"
+            name="qty"
+            type="number"
+            min="1"
+            class="input input--qty"
+            required
+            placeholder="e.g. 50"
+            [(ngModel)]="quantityToAdd"
+            [disabled]="submitting()"
+          />
+        </div>
+        <button mat-flat-button type="submit" class="btn btn--indigo btn--block" [disabled]="submitting() || !quantityToAdd">
+          @if (submitting()) {
+            <span class="btn__content"><mat-icon class="spin">autorenew</mat-icon> Processing...</span>
+          } @else {
+            Confirm &amp; Add Stock
+          }
+        </button>
+      </form>
+    </div>
+  </div>
+</div>

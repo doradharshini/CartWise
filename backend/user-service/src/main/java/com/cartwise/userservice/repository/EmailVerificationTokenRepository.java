@@ -1,0 +1,13 @@
+package com.cartwise.userservice.repository;
+
+import com.cartwise.userservice.entity.EmailVerificationToken;
+import com.cartwise.userservice.entity.User;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.Optional;
+
+public interface EmailVerificationTokenRepository extends JpaRepository<EmailVerificationToken, String> {
+    void deleteByUser(User user);
+
+    Optional<EmailVerificationToken> findByToken(String token);
+}

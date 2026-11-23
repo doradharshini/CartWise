@@ -1,0 +1,141 @@
+<div class="cart-page">
+  @if (isLoading()) {
+    <div class="cart-page__container cart-page__container--padded">
+      <div class="cart-layout cart-layout--skeleton">
+        <div class="cart-layout__main">
+          @for (i of skeletonRows; track i) {
+            <div class="cart-skeleton__row" [style.opacity]="1 - (i - 1) * 0.2"></div>
+          }
+        </div>
+        <div class="cart-skeleton__summary"></div>
+      </div>
+    </div>
+  } @else if (error()) {
+    <div class="cart-state cart-state--error">
+      <mat-icon class="cart-state__icon cart-state__icon--error">error_outline</mat-icon>
+      <h2 class="cart-state__title">Cart Error</h2>
+      <p class="cart-state__text">{{ error() }}</p>
+      <button mat-stroked-button (click)="reload()">Try Again</button>
+    </div>
+  } @else if (cartItems().length === 0) {
+    <div class="cart-state cart-state--empty">
+      <div class="cart-empty__float">
+        <div class="cart-empty__badge">
+          <mat-icon class="cart-empty__icon">remove_shopping_cart</mat-icon>
+        </div>
+      </div>
+      <h2 class="cart-state__title">Your cart is empty</h2>
+      <p class="cart-state__text cart-state__text--narrow">
+        Looks like you haven't added anything to your cart yet. Let's change that!
+      </p>
+      <button mat-flat-button class="cart-btn cart-btn--lg" (click)="goCatalog()">
+        Continue Shopping
+      </button>
+    </div>
+  } @else {
+    @if (notification().show) {
+      <div class="cart-toast">
+        <div
+          class="cart-toast__body"
+          [class.cart-toast__body--error]="notification().type === 'error'"
+          [class.cart-toast__body--info]="notification().type !== 'error'"
+        >
+          <mat-icon class="cart-toast__icon">{{ notification().type === 'error' ? 'error_outline' : 'check_circle' }}</mat-icon>
+          {{ notification().message }}
+        </div>
+      </div>
+    }
+
+    <main class="cart-page__container cart-page__main">
+      <div class="cart-header">
+        <div class="cart-header__text">
+          <h1 class="cart-header__title">Shopping Cart</h1>
+          <p class="cart-header__subtitle">
+            You have {{ cartItems().length }} {{ cartItems().length === 1 ? 'item' : 'items' }} in your cart
+          </p>
+        </div>
+        <button mat-button class="cart-header__back" (click)="goCatalog()">
+          <mat-icon>arrow_back</mat-icon> Continue shopping
+        </button>
+      </div>
+
+      <div class="cart-layout">
+        <div class="cart-layout__main">
+          @for (item of cartItems(); track item.skuCode; let idx = $index) {
+            <div class="cart-item cart-item--{{ getItemAccent(item, idx) }}" [style.animation-delay.ms]="idx * 70">
+              <mat-card appearance="outlined" class="cart-item__card">
+                <div class="cart-item__bar"></div>
+                <div class="cart-item__content">
+                  <div class="cart-item__thumb">
+                    @if (item.imageUrl) {
+                      <img class="cart-item__img" [src]="item.imageUrl" [alt]="item.name" />
+                    } @else {
+                      <mat-icon class="cart-item__placeholder">image</mat-icon>
+                    }
+                  </div>
+
+                  <div class="cart-item__body">
+                    <div class="cart-item__top">
+                      <div class="cart-item__info">
+                        <a class="cart-item__name" [routerLink]="['/product', item.productId]">{{ item.name }}</a>
+                        <div class="cart-item__meta">
+                          <p class="cart-item__sku">SKU: {{ item.skuCode }}</p>
+                          <span class="cart-item__category">{{ item.category }}</span>
+                        </div>
+                      </div>
+                      <button
+                        mat-icon-button
+                        class="cart-item__remove"
+                        (click)="handleRemove(item.skuCode)"
+                        [disabled]="isProcessing()"
+                        aria-label="Remove item"
+                      >
+                        <mat-icon>delete_outline</mat-icon>
+                      </button>
+                    </div>
+
+                    <div class="cart-item__bottom">
+                      <div class="cart-item__qty">
+                        <button
+                          mat-icon-button
+                          class="cart-item__qty-btn"
+                          (click)="updateQuantity(item.skuCode, -1)"
+                          [disabled]="isProcessing() || item.quantity <= 1"
+                          aria-label="Decrease"
+                        >
+                          <mat-icon>remove</mat-icon>
+                        </button>
+                        @for (q of [item.quantity]; track q) {
+                          <span class="cart-item__qty-value">{{ q }}</span>
+                        }
+                        <button
+                          mat-icon-button
+                          class="cart-item__qty-btn"
+                          (click)="updateQuantity(item.skuCode, 1)"
+                          [disabled]="isProcessing()"
+                          aria-label="Increase"
+                        >
+                          <mat-icon>add</mat-icon>
+                        </button>
+                      </div>
+                      <span class="cart-item__price">{{ formatPrice(item.snapshotPrice * item.quantity) }}</span>
+                    </div>
+                  </div>
+                </div>
+              </mat-card>
+            </div>
+          }
+        </div>
+
+        <app-cart-summary
+          class="cart-layout__aside"
+          [subtotal]="subtotal()"
+          [deliveryFee]="deliveryFee()"
+          [total]="total()"
+          [freeDeliveryThreshold]="FREE_DELIVERY_THRESHOLD"
+          (checkout)="goCheckout()"
+        />
+      </div>
+    </main>
+  }
+</div>

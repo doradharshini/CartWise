@@ -1,0 +1,142 @@
+@if (isLoading() && products().length === 0) {
+  <div class="search-page">
+    <div class="search-page__container">
+      <div class="search-page__loading-title"></div>
+      <div class="search-page__grid">
+        @for (i of skeletons; track i) {
+          <div class="skeleton">
+            <div class="skeleton__image"></div>
+            <div class="skeleton__line skeleton__line--label"></div>
+            <div class="skeleton__line skeleton__line--title"></div>
+            <div class="skeleton__line skeleton__line--button"></div>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+} @else if (error()) {
+  <div class="search-page">
+    <div class="search-page__error">
+      <mat-icon class="search-page__error-icon">error_outline</mat-icon>
+      <h2 class="search-page__error-title">Oops!</h2>
+      <p class="search-page__error-text">{{ error() }}</p>
+      <button mat-flat-button class="search-page__retry" (click)="reload()">Try Again</button>
+    </div>
+  </div>
+} @else {
+  <div class="search-page">
+    <main class="search-page__container search-page__container--main">
+      <button type="button" class="search-page__back" (click)="goHome()">
+        <mat-icon class="search-page__back-icon">arrow_back</mat-icon> Back to Home
+      </button>
+
+      <div class="search-page__header">
+        <div appReveal [revealY]="16" [revealDuration]="420">
+          <p class="search-page__eyebrow">Search Results</p>
+          <h1 class="search-page__title">{{ query() ? '“' + query() + '”' : 'Search' }}</h1>
+          <p class="search-page__count">Found {{ totalElements() }} product{{ totalElements() === 1 ? '' : 's' }}</p>
+        </div>
+
+        @if (query()) {
+          <div class="search-page__live" appReveal [revealY]="16" [revealDelay]="60">
+            <mat-icon class="search-page__live-icon">refresh</mat-icon> Live catalog search
+          </div>
+        }
+      </div>
+
+      @if (!query()) {
+        <div class="empty">
+          <mat-icon class="empty__icon">search_off</mat-icon>
+          <h2 class="empty__title">Start typing to search</h2>
+          <p class="empty__text">Enter a product name, category, or brand to see matching items.</p>
+        </div>
+      } @else if (products().length === 0) {
+        <div class="empty">
+          <mat-icon class="empty__icon">search_off</mat-icon>
+          <h2 class="empty__title">No matches found</h2>
+          <p class="empty__text">
+            We couldn't find anything matching “{{ query() }}”. Try checking your spelling or using more general terms.
+          </p>
+        </div>
+      } @else {
+        <div class="search-page__grid">
+          @for (product of products(); track product.id; let index = $index) {
+            <div class="result" appReveal [revealY]="16" [revealDuration]="420" [revealDelay]="index * 60">
+              <div class="result__card">
+                <a class="result__link" [routerLink]="['/product', product.id]">
+                  <div class="result__media">
+                    @if (product.imageUrl && !failedImages().has(product.id)) {
+                      <img class="result__img" [src]="product.imageUrl" [alt]="product.name" (error)="markImageFailed(product.id)" />
+                    } @else {
+                      <div class="result__placeholder">
+                        <mat-icon class="result__placeholder-icon">image</mat-icon>
+                      </div>
+                    }
+
+                    <button
+                      type="button"
+                      class="result__wish"
+                      [class.result__wish--saved]="wishlist.isSaved(product.skuCode)"
+                      [disabled]="wishBusy() === product.skuCode"
+                      [attr.aria-label]="wishlist.isSaved(product.skuCode) ? 'Remove from wishlist' : 'Add to wishlist'"
+                      (click)="$event.preventDefault(); handleWishlist(product.skuCode)"
+                    >
+                      @if (wishBusy() === product.skuCode) {
+                        <mat-icon class="result__wish-icon result__wish-icon--spin">refresh</mat-icon>
+                      } @else if (wishlist.isSaved(product.skuCode)) {
+                        <mat-icon class="result__wish-icon">check</mat-icon>
+                      } @else {
+                        <mat-icon class="result__wish-icon">favorite_border</mat-icon>
+                      }
+                    </button>
+                  </div>
+
+                  <div class="result__body">
+                    <div class="result__category">{{ product.category?.name || 'Uncategorized' }}</div>
+                    <h3 class="result__title">{{ product.name }}</h3>
+                    <div class="result__rating">
+                      <app-product-rating-badge [skuCode]="product.skuCode" />
+                    </div>
+                    <div class="result__price">{{ formatPrice(product.price) }}</div>
+                  </div>
+                </a>
+
+                <div class="result__footer">
+                  <button
+                    mat-flat-button
+                    class="result__add"
+                    (click)="$event.preventDefault(); handleAddToCart(product.skuCode)"
+                  >
+                    <mat-icon class="result__add-icon">shopping_cart</mat-icon> Add to Cart
+                  </button>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+
+        @if (totalPages() > 1) {
+          <nav class="pagination" aria-label="Pagination">
+            <button
+              mat-stroked-button
+              class="pagination__step"
+              (click)="goToPage(currentPage() > 0 ? currentPage() - 1 : 0)"
+              [disabled]="currentPage() === 0"
+            >
+              <mat-icon class="pagination__step-icon pagination__step-icon--start">chevron_left</mat-icon> Previous
+            </button>
+            <span class="pagination__status">Page {{ currentPage() + 1 }} of {{ totalPages() }}</span>
+            <button
+              mat-stroked-button
+              class="pagination__step"
+              (click)="goToPage(currentPage() < totalPages() - 1 ? currentPage() + 1 : totalPages() - 1)"
+              [disabled]="currentPage() >= totalPages() - 1"
+            >
+              Next <mat-icon iconPositionEnd class="pagination__step-icon pagination__step-icon--end">chevron_right</mat-icon>
+            </button>
+          </nav>
+        }
+      }
+    </main>
+  </div>
+}

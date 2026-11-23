@@ -1,0 +1,133 @@
+@if (auth.isAuthenticated()) {
+<div class="become-seller">
+  <div class="become-seller__layout">
+    <!-- Left: Info Panel -->
+    <div class="info">
+      <div class="info__intro fade-up">
+        <p class="info__eyebrow">Cartwise Merchant Program</p>
+        <h1 class="info__title">
+          Start selling to
+          <br />
+          <span class="info__title-muted">millions of shoppers</span>
+        </h1>
+        <p class="info__lead">
+          Join India's fastest-growing e-commerce network. List your products, reach nationwide buyers, and scale your
+          business instantly.
+        </p>
+      </div>
+
+      <div class="perks">
+        @for (perk of perks; track perk.label; let i = $index) {
+          <div class="perk fade-up" [style.animation-delay.ms]="(i + 1) * 80">
+            <div class="perk__icon">
+              <mat-icon>{{ perk.icon }}</mat-icon>
+            </div>
+            <div>
+              <p class="perk__label">{{ perk.label }}</p>
+              <p class="perk__desc">{{ perk.desc }}</p>
+            </div>
+          </div>
+        }
+      </div>
+
+      <div class="community fade-up" style="animation-delay: 400ms">
+        <div class="community__icon">
+          <mat-icon>shopping_bag</mat-icon>
+        </div>
+        <div>
+          <p class="community__eyebrow">Join the community</p>
+          <p class="community__title">500+ Verified Sellers</p>
+          <p class="community__desc">selling over 10,000+ products every day.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Form Card -->
+    <div class="card fade-up" style="animation-delay: 100ms">
+      <div class="card__header">
+        <div class="card__glow"></div>
+        <div class="card__header-row">
+          <div class="card__header-icon">
+            <mat-icon>storefront</mat-icon>
+          </div>
+          <div>
+            <h2 class="card__title">Register Your Shop</h2>
+            <p class="card__subtitle">Setup takes less than a minute.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card__body">
+        @if (success()) {
+          <div class="success pop-in">
+            <div class="success__badge">
+              <mat-icon>check_circle</mat-icon>
+            </div>
+            <div>
+              <h3 class="success__title">Shop Registered! 🎉</h3>
+              <p class="success__text">
+                Your account is now a Seller profile. We'll log you out securely to apply the changes.
+              </p>
+            </div>
+            <div class="success__countdown">
+              <mat-icon class="spin">autorenew</mat-icon>
+              Redirecting to login in {{ countdown() }}s…
+            </div>
+          </div>
+        } @else {
+          <form class="form" (ngSubmit)="handleSubmit()" #f="ngForm">
+            @if (error()) {
+              <div class="form__error">
+                <mat-icon>error_outline</mat-icon>
+                <span>{{ error() }}</span>
+              </div>
+            }
+
+            <div class="field">
+              <label class="field__label" for="shopName">
+                Shop Name <span class="field__required">*</span>
+              </label>
+              <input
+                id="shopName"
+                name="shopName"
+                class="field__input"
+                required
+                maxlength="50"
+                [(ngModel)]="shopName"
+                placeholder="e.g. The Modern Furniture Store"
+              />
+              <p class="field__hint">This is your public brand identity — choose carefully.</p>
+            </div>
+
+            <div class="field">
+              <label class="field__label" for="shopDescription">Shop Description</label>
+              <textarea
+                id="shopDescription"
+                name="shopDescription"
+                class="field__textarea"
+                maxlength="500"
+                [(ngModel)]="shopDescription"
+                placeholder="Tell buyers what you sell, your speciality, or what makes your products unique…"
+              ></textarea>
+              <p class="field__counter">{{ shopDescription.length }}/500</p>
+            </div>
+
+            <div class="trust-note">
+              <mat-icon>auto_awesome</mat-icon>
+              <p>For security, you'll be prompted to log in once more to activate your new Seller Dashboard.</p>
+            </div>
+
+            <button mat-flat-button type="submit" class="submit" [disabled]="isSubmitting()">
+              @if (isSubmitting()) {
+                <span class="submit__content"><mat-icon class="spin">autorenew</mat-icon> Registering…</span>
+              } @else {
+                <span class="submit__content">Launch My Store <mat-icon>arrow_forward</mat-icon></span>
+              }
+            </button>
+          </form>
+        }
+      </div>
+    </div>
+  </div>
+</div>
+}

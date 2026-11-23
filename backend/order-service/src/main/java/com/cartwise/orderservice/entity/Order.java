@@ -1,0 +1,51 @@
+package com.cartwise.orderservice.entity;
+
+import com.cartwise.orderservice.enums.OrderStatus;
+import com.cartwise.orderservice.enums.PaymentMethod;
+import com.cartwise.orderservice.enums.PaymentStatus;
+import jakarta.persistence.*;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
+
+@Entity
+@Table(name = "orders")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class Order {
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
+
+    private String orderNumber;
+    private String userId;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "order_id", referencedColumnName = "id")
+    private List<OrderLineItem> orderLineItems;
+
+    @Enumerated(EnumType.STRING)
+    private OrderStatus orderStatus;
+
+    @Enumerated(EnumType.STRING)
+    private PaymentStatus paymentStatus;
+
+    @Enumerated(EnumType.STRING)
+    private PaymentMethod paymentMethod;
+
+    @Embedded
+    private ShippingAddress shippingAddress;
+
+    @Column(nullable = false)
+    private BigDecimal totalAmount;
+
+    @CreationTimestamp
+    private LocalDateTime createdAt;
+}

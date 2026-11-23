@@ -1,0 +1,24 @@
+<div class="backdrop anim-fade">
+  <div class="modal modal--narrow modal--padded anim-pop">
+    <div class="confirm__top">
+      <div class="confirm__icon">
+        <mat-icon>delete_outline</mat-icon>
+      </div>
+      <div>
+        <h3 class="confirm__title">Delete Product</h3>
+        <p class="confirm__name">{{ target().name }}</p>
+      </div>
+    </div>
+    <p class="confirm__warning">This permanently removes the product from your catalog. This action cannot be undone.</p>
+    <div class="confirm__actions">
+      <button mat-stroked-button class="btn btn--outline btn--grow" (click)="cancelled.emit()" [disabled]="busy()">Cancel</button>
+      <button mat-flat-button class="btn btn--red btn--grow" (click)="confirmed.emit()" [disabled]="busy()">
+        @if (busy()) {
+          <mat-icon class="spin">autorenew</mat-icon>
+        } @else {
+          Yes, Delete
+        }
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,142 @@
+    <div class="checkout-summary">
+      <div class="checkout-summary__head">
+        <div class="checkout-summary__glow"></div>
+        <div class="checkout-summary__head-text">
+          <h2 class="checkout-summary__title">Order Summary</h2>
+          <p class="checkout-summary__count">
+            {{ items().length }} item{{ items().length !== 1 ? 's' : '' }} in your order
+          </p>
+        </div>
+      </div>
+
+      <div class="checkout-summary__body">
+        <!-- Items -->
+        <div class="checkout-items">
+          @for (item of items(); track item.skuCode) {
+            <div class="checkout-item">
+              <div class="checkout-item__thumb">
+                @if (item.imageUrl) {
+                  <img class="checkout-item__img" [src]="item.imageUrl" [alt]="item.name" />
+                } @else {
+                  <mat-icon class="checkout-item__placeholder">image</mat-icon>
+                }
+              </div>
+              <div class="checkout-item__info">
+                <p class="checkout-item__name">{{ item.name }}</p>
+                <p class="checkout-item__qty">Qty {{ item.quantity }}</p>
+              </div>
+              <span class="checkout-item__price">{{ formatPrice(item.snapshotPrice * item.quantity) }}</span>
+            </div>
+          }
+        </div>
+
+        <mat-divider class="checkout-divider" />
+
+        <!-- Coupon -->
+        @if (appliedCoupon()) {
+          <div class="checkout-coupon-applied">
+            <span class="checkout-coupon-applied__text">
+              <mat-icon class="checkout-icon checkout-icon--sm">check_circle</mat-icon>
+              Code '{{ appliedCoupon() }}' applied
+            </span>
+            <button class="checkout-coupon-applied__remove" (click)="removeCoupon.emit()" aria-label="Remove coupon">
+              <mat-icon class="checkout-coupon-applied__remove-icon">close</mat-icon>
+            </button>
+          </div>
+        } @else {
+          <div class="checkout-coupon">
+            <div class="checkout-coupon__field">
+              <mat-icon class="checkout-coupon__icon">sell</mat-icon>
+              <input
+                class="checkout-coupon__input"
+                placeholder="Promo code"
+                [ngModel]="couponCode()"
+                (ngModelChange)="couponCode.set($event)"
+                [disabled]="isApplyingCoupon()"
+                (keydown.enter)="applyCoupon.emit()"
+              />
+            </div>
+            <button
+              mat-stroked-button
+              class="checkout-coupon__btn"
+              (click)="applyCoupon.emit()"
+              [disabled]="isApplyingCoupon() || !couponCode().trim()"
+            >
+              @if (isApplyingCoupon()) {
+                <mat-spinner diameter="16" />
+              } @else {
+                Apply
+              }
+            </button>
+          </div>
+        }
+
+        <mat-divider class="checkout-divider" />
+
+        <!-- Price breakdown -->
+        <div class="checkout-breakdown">
+          <div class="checkout-breakdown__row">
+            <span>Subtotal</span>
+            <span class="checkout-breakdown__value">{{ formatPrice(subtotal()) }}</span>
+          </div>
+          @if (discountAmount() > 0) {
+            <div class="checkout-breakdown__row checkout-breakdown__row--discount">
+              <span>Discount ({{ appliedCoupon() }})</span>
+              <span>-{{ formatPrice(discountAmount()) }}</span>
+            </div>
+          }
+          <div class="checkout-breakdown__row">
+            <span>Delivery Fee</span>
+            <span
+              class="checkout-breakdown__value"
+              [class.checkout-breakdown__value--free]="deliveryFee() === 0"
+              >{{ deliveryFee() === 0 ? 'Free ✓' : formatPrice(deliveryFee()) }}</span
+            >
+          </div>
+          @if (platformFee() > 0) {
+            <div class="checkout-breakdown__row">
+              <span>Platform Fee (COD)</span>
+              <span class="checkout-breakdown__value">{{ formatPrice(platformFee()) }}</span>
+            </div>
+          }
+        </div>
+
+        <div class="checkout-total">
+          <span class="checkout-total__label">Total</span>
+          <span class="checkout-total__value">{{ formatPrice(total()) }}</span>
+        </div>
+
+        @if (deliveryFee() === 0) {
+          <div class="checkout-free-note">
+            <mat-icon class="checkout-free-note__icon">local_shipping</mat-icon>
+            Free delivery applied on orders above ₹{{ freeDeliveryThreshold() }}
+          </div>
+        }
+
+        <button
+          mat-flat-button
+          class="checkout-place-btn"
+          (click)="placeOrder.emit()"
+          [disabled]="isPlacingOrder() || !hasAddresses()"
+        >
+          @if (isPlacingOrder()) {
+            <span class="checkout-place-btn__content">
+              <mat-icon class="checkout-place-btn__spin">refresh</mat-icon> Processing…
+            </span>
+          } @else {
+            <span class="checkout-place-btn__content">
+              <mat-icon>lock</mat-icon> Place Order &amp; Pay
+            </span>
+          }
+        </button>
+
+        @if (!hasAddresses()) {
+          <p class="checkout-warning">Add a shipping address above to place your order.</p>
+        }
+
+        <div class="checkout-secure">
+          <mat-icon class="checkout-secure__icon">lock</mat-icon>
+          Secured by 256-bit SSL encryption
+        </div>
+      </div>
+    </div>
