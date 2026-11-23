@@ -104,6 +104,14 @@ graph TB
 
 ---
 
+## Design Documents
+
+- [User flows](docs/USER_FLOW.md) — buyer, seller and admin journeys
+- [High-level design](docs/HLD.md) — components, communication, Kafka topics, security
+- [Low-level design](docs/LLD.md) — data model, APIs, checkout and payment sequences, state machines
+
+---
+
 ## Services
 
 | Service                  | Responsibility                                                                                                                                                                                                                                                                                                                                                                          |
